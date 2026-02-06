@@ -33,7 +33,6 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
 
-        // Only update allowed fields: firstName, lastName, role, enabled
         if (request.getFirstName() != null) {
             user.setFirstName(request.getFirstName());
         }
@@ -43,7 +42,6 @@ public class UserService {
         if (request.getRole() != null) {
             user.setRole(request.getRole());
         }
-        // enabled is primitive boolean, check if explicitly set in request
         user.setEnabled(request.isEnabled());
 
         user = userRepository.save(user);

@@ -12,21 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Service for managing feature flag definitions.
- */
 @Service
 @RequiredArgsConstructor
 public class FlagService {
 
     private final FlagRepository flagRepository;
 
-    /**
-     * Get all active flags, optionally filtered by search query.
-     *
-     * @param search optional search term for key, name, or description
-     * @return list of matching flags
-     */
     public List<FlagDto> getAllFlags(String search) {
         List<Flag> flags;
         if (search != null && !search.isBlank()) {
@@ -40,34 +31,18 @@ public class FlagService {
                 .toList();
     }
 
-    /**
-     * Get a flag by ID.
-     *
-     * @param id the flag ID
-     * @return the flag DTO
-     * @throws ResourceNotFoundException if flag not found
-     */
     public FlagDto getFlagById(UUID id) {
         Flag flag = flagRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Flag", "id", id));
         return FlagDto.from(flag);
     }
 
-    /**
-     * Create a new flag.
-     *
-     * @param request the flag creation request
-     * @return the created flag DTO
-     * @throws IllegalArgumentException if key already exists or default value is invalid
-     */
     @Transactional
     public FlagDto createFlag(FlagDto request) {
-        // Validate key uniqueness
         if (flagRepository.existsByKeyAndIsActiveTrue(request.getKey())) {
             throw new IllegalArgumentException("Flag with key '" + request.getKey() + "' already exists");
         }
 
-        // Validate default value against type
         validateDefaultValue(request.getType(), request.getDefaultValue());
 
         Flag flag = Flag.builder()
@@ -83,23 +58,10 @@ public class FlagService {
         return FlagDto.from(savedFlag);
     }
 
-    /**
-     * Update an existing flag.
-     * Note: The key and type fields are immutable and will be ignored if provided.
-     *
-     * @param id the flag ID
-     * @param request the update request
-     * @return the updated flag DTO
-     * @throws ResourceNotFoundException if flag not found
-     * @throws IllegalArgumentException if default value is invalid for the flag's type
-     */
     @Transactional
     public FlagDto updateFlag(UUID id, FlagDto request) {
         Flag flag = flagRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Flag", "id", id));
-
-        // Key is immutable - do not update
-        // Type is immutable - do not update
 
         if (request.getName() != null) {
             flag.setName(request.getName());
@@ -110,7 +72,6 @@ public class FlagService {
         }
 
         if (request.getDefaultValue() != null) {
-            // Validate default value against the flag's existing type
             validateDefaultValue(flag.getType(), request.getDefaultValue());
             flag.setDefaultValue(request.getDefaultValue());
         }
@@ -119,12 +80,6 @@ public class FlagService {
         return FlagDto.from(savedFlag);
     }
 
-    /**
-     * Delete a flag (soft delete).
-     *
-     * @param id the flag ID
-     * @throws ResourceNotFoundException if flag not found
-     */
     @Transactional
     public void deleteFlag(UUID id) {
         Flag flag = flagRepository.findByIdAndIsActiveTrue(id)
@@ -134,13 +89,6 @@ public class FlagService {
         flagRepository.save(flag);
     }
 
-    /**
-     * Validates that the default value is compatible with the specified flag type.
-     *
-     * @param type the flag type
-     * @param defaultValue the value to validate
-     * @throws IllegalArgumentException if the value is not valid for the type
-     */
     private void validateDefaultValue(FlagType type, String defaultValue) {
         if (defaultValue == null || defaultValue.isBlank()) {
             throw new IllegalArgumentException("Default value is required");

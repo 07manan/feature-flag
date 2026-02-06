@@ -60,7 +60,6 @@ public class EnvironmentService {
         Environment environment = environmentRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Environment", "id", id));
 
-        // Key is not updatable - only update name and description
         if (request.getName() != null) {
             environment.setName(request.getName());
         }
@@ -77,7 +76,6 @@ public class EnvironmentService {
         Environment environment = environmentRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Environment", "id", id));
 
-        // Soft delete - set isActive to false
         environment.setIsActive(false);
         environmentRepository.save(environment);
     }
