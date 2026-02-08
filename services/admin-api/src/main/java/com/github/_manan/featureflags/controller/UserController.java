@@ -1,5 +1,6 @@
 package com.github._manan.featureflags.controller;
 
+import com.github._manan.featureflags.dto.UpdateUserRequest;
 import com.github._manan.featureflags.dto.UserDto;
 import com.github._manan.featureflags.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class UserController {
     @PatchMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(
             @PathVariable UUID id,
-            @RequestBody UserDto request) {
+            @RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
 

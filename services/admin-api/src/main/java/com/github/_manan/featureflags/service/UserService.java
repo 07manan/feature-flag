@@ -1,5 +1,6 @@
 package com.github._manan.featureflags.service;
 
+import com.github._manan.featureflags.dto.UpdateUserRequest;
 import com.github._manan.featureflags.dto.UserDto;
 import com.github._manan.featureflags.entity.User;
 import com.github._manan.featureflags.repository.UserRepository;
@@ -29,7 +30,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto updateUser(UUID id, UserDto request) {
+    public UserDto updateUser(UUID id, UpdateUserRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
 
@@ -42,7 +43,9 @@ public class UserService {
         if (request.getRole() != null) {
             user.setRole(request.getRole());
         }
-        user.setEnabled(request.isEnabled());
+        if (request.getEnabled() != null) {
+            user.setEnabled(request.getEnabled());
+        }
 
         user = userRepository.save(user);
         return UserDto.from(user);

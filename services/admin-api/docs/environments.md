@@ -167,7 +167,7 @@ Content-Type: application/json
 
 | Status | Condition |
 |--------|-----------|
-| `400 Bad Request` | Environment not found or has been deleted |
+| `404 Not Found` | Environment not found or has been deleted |
 
 ---
 
@@ -293,7 +293,7 @@ Content-Type: application/json
 
 | Status | Condition |
 |--------|-----------|
-| `400 Bad Request` | Environment not found or has been deleted |
+| `404 Not Found` | Environment not found or has been deleted |
 
 ---
 
@@ -323,7 +323,7 @@ HTTP/1.1 204 No Content
 
 | Status | Condition |
 |--------|-----------|
-| `400 Bad Request` | Environment not found or has already been deleted |
+| `404 Not Found` | Environment not found or has already been deleted |
 
 ---
 
