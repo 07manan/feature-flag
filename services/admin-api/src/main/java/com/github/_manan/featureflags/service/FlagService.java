@@ -5,6 +5,7 @@ import com.github._manan.featureflags.entity.Flag;
 import com.github._manan.featureflags.entity.FlagType;
 import com.github._manan.featureflags.exception.ResourceNotFoundException;
 import com.github._manan.featureflags.repository.FlagRepository;
+import com.github._manan.featureflags.repository.FlagValueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class FlagService {
 
     private final FlagRepository flagRepository;
+    private final FlagValueRepository flagValueRepository;
 
     public List<FlagDto> getAllFlags(String search) {
         List<Flag> flags;
@@ -85,6 +87,8 @@ public class FlagService {
         Flag flag = flagRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Flag", "id", id));
 
+        flagValueRepository.deactivateByFlagId(id);
+        
         flag.setIsActive(false);
         flagRepository.save(flag);
     }

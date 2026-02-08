@@ -34,6 +34,8 @@ curl -X GET "http://localhost:8080/users" \
 | **Authentication** | User registration and login | [authentication.md](authentication.md) |
 | **Users** | User management (CRUD) | [users.md](users.md) |
 | **Environments** | Deployment environment management | [environments.md](environments.md) |
+| **Flags** | Feature flag definitions | [flags.md](flags.md) |
+| **Flag Values** | Environment-specific flag configurations with percentage-based rollouts | [flag-values.md](flag-values.md) |
 
 ---
 

@@ -4,6 +4,7 @@ import com.github._manan.featureflags.dto.EnvironmentDto;
 import com.github._manan.featureflags.entity.Environment;
 import com.github._manan.featureflags.exception.ResourceNotFoundException;
 import com.github._manan.featureflags.repository.EnvironmentRepository;
+import com.github._manan.featureflags.repository.FlagValueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class EnvironmentService {
 
     private final EnvironmentRepository environmentRepository;
+    private final FlagValueRepository flagValueRepository;
 
     public List<EnvironmentDto> getAll(String search) {
         List<Environment> environments;
@@ -76,6 +78,8 @@ public class EnvironmentService {
         Environment environment = environmentRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Environment", "id", id));
 
+        flagValueRepository.deactivateByEnvironmentId(id);
+        
         environment.setIsActive(false);
         environmentRepository.save(environment);
     }
