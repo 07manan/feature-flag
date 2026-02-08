@@ -1,5 +1,6 @@
 package com.github._manan.featureflags.exception;
 
+import com.github._manan.featureflags.oauth.OAuthVerificationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -68,6 +69,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({BadCredentialsException.class, UsernameNotFoundException.class})
     public ResponseEntity<Map<String, Object>> handleAuthenticationException(Exception ex) {
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+    }
+
+    @ExceptionHandler(OAuthVerificationException.class)
+    public ResponseEntity<Map<String, Object>> handleOAuthVerificationException(OAuthVerificationException ex) {
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

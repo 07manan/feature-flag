@@ -12,13 +12,18 @@ http://localhost:8080
 
 ### Authentication
 
-Most endpoints require JWT authentication. Obtain a token via the login endpoint:
+Most endpoints require JWT authentication. Obtain a token via login or OAuth:
 
 ```bash
-# Login to get a token
+# Login with email/password
 curl -X POST "http://localhost:8080/auth/login" \
   -H "Content-Type: application/json" \
   -d '{"email": "admin@example.com", "password": "password123"}'
+
+# Or login with Google OAuth
+curl -X POST "http://localhost:8080/auth/oauth2/google" \
+  -H "Content-Type: application/json" \
+  -d '{"token": "<google_id_token>"}'
 
 # Use the token in subsequent requests
 curl -X GET "http://localhost:8080/users" \
@@ -31,7 +36,7 @@ curl -X GET "http://localhost:8080/users" \
 
 | API | Description | Documentation |
 |-----|-------------|---------------|
-| **Authentication** | User registration and login | [authentication.md](authentication.md) |
+| **Authentication** | User registration, login, and OAuth (Google) | [authentication.md](authentication.md) |
 | **Users** | User management (CRUD) | [users.md](users.md) |
 | **Environments** | Deployment environment management | [environments.md](environments.md) |
 | **Flags** | Feature flag definitions | [flags.md](flags.md) |

@@ -1,6 +1,6 @@
 # Authentication API
 
-The Authentication API provides endpoints for user registration and login in the feature flag system. It uses JWT (JSON Web Token) for stateless authentication.
+The Authentication API provides endpoints for user registration, login, and OAuth authentication in the feature flag system. It uses JWT (JSON Web Token) for stateless authentication.
 
 ## Table of Contents
 
@@ -8,6 +8,7 @@ The Authentication API provides endpoints for user registration and login in the
 - [Endpoints](#endpoints)
   - [Register](#register)
   - [Login](#login)
+  - [OAuth2 Login](#oauth2-login)
 - [Data Models](#data-models)
 - [Error Responses](#error-responses)
 - [Security Considerations](#security-considerations)
@@ -16,11 +17,19 @@ The Authentication API provides endpoints for user registration and login in the
 
 ## Overview
 
-The Authentication API allows users to create accounts and obtain JWT tokens for accessing protected endpoints.
+The Authentication API allows users to create accounts and obtain JWT tokens for accessing protected endpoints. Users can authenticate via email/password or OAuth providers (Google, with GitHub and Microsoft coming soon).
 
 **Base URL:** `/auth`
 
 **Public Endpoints:** All authentication endpoints are publicly accessible (no token required).
+
+**Supported OAuth Providers:**
+
+| Provider | Status | ID Token Source |
+|----------|--------|----------------|
+| Google | ✅ Available | Google Sign-In SDK |
+| GitHub | 🔜 Coming Soon | - |
+| Microsoft | 🔜 Coming Soon | - |
 
 ---
 
@@ -158,6 +167,89 @@ Content-Type: application/json
 
 ---
 
+### OAuth2 Login
+
+Authenticate using an OAuth provider (e.g., Google) and receive a JWT token.
+
+**Request**
+
+```
+POST /auth/oauth2/{provider}
+Content-Type: application/json
+```
+
+**Path Parameters**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `provider` | `string` | OAuth provider name: `google`, `github`, `microsoft` (case-insensitive) |
+
+**Request Body**
+
+```json
+{
+  "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `token` | `string` | Yes | The ID token from the OAuth provider |
+
+**Response**
+
+```
+HTTP/1.1 200 OK
+Content-Type: application/json
+```
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tokenType": "Bearer",
+  "user": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "email": "user@gmail.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "role": "GUEST",
+    "enabled": true,
+    "createdAt": "2026-01-28T14:00:00Z",
+    "updatedAt": "2026-01-28T14:00:00Z"
+  }
+}
+```
+
+**Behavior**
+
+| Scenario | Result |
+|----------|--------|
+| New user (email not in system) | Creates new account, links OAuth provider |
+| Existing user (same email) | Links OAuth provider to existing account (merge) |
+| Returning OAuth user | Returns existing user |
+
+**Error Responses**
+
+| Status | Condition |
+|--------|-----------||
+| `400 Bad Request` | Missing token in request body |
+| `400 Bad Request` | Unsupported OAuth provider |
+| `401 Unauthorized` | Invalid or expired OAuth token |
+| `401 Unauthorized` | Email not verified by provider |
+
+**Example: Invalid Token**
+
+```json
+{
+  "timestamp": "2026-01-28T14:00:00Z",
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Invalid Google ID token"
+}
+```
+
+---
+
 ## Data Models
 
 ### AuthResponse
@@ -258,6 +350,14 @@ Returned on successful registration or login.
 - Disabled accounts cannot authenticate (receive `401 Unauthorized`)
 - Account status can be modified by admins via the [Users API](users.md)
 
+### OAuth Authentication
+
+- **Token Verification**: OAuth tokens are verified directly with the provider (Google's public keys)
+- **Account Merging**: If a user with the same email already exists, the OAuth provider is linked to the existing account
+- **Multiple Providers**: A single user can have multiple OAuth providers linked (e.g., both Google and GitHub)
+- **No Password Required**: OAuth-only users don't have a password set
+- **Email Verification**: Only verified emails from OAuth providers are accepted
+
 ---
 
 ## Examples
@@ -283,6 +383,16 @@ curl -X POST "http://localhost:8080/auth/login" \
   -d '{
     "email": "newuser@example.com",
     "password": "securePassword123"
+  }'
+```
+
+**OAuth2 Login (Google):**
+```bash
+# The token is obtained from Google Sign-In on the frontend
+curl -X POST "http://localhost:8080/auth/oauth2/google" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
   }'
 ```
 
