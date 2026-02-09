@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useDebounce } from "use-debounce";
-import { Plus, Pencil, Search, Loader2 } from "lucide-react";
+import { Plus, Pencil, Search, Loader2, Settings } from "lucide-react";
 import { toast } from "sonner";
 
 import { ApiError } from "@/lib/api/client";
@@ -13,7 +13,6 @@ import type { Environment } from "@/lib/types";
 import { DeleteEnvironmentDialog } from "@/components/environments";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
     Table,
     TableBody,
@@ -23,11 +22,6 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const STATUS_BADGE_STYLES = {
-    active: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-    inactive: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
-};
 
 export default function EnvironmentsPage() {
     const [environments, setEnvironments] = useState<Environment[]>([]);
@@ -111,7 +105,6 @@ export default function EnvironmentsPage() {
                                     <TableRow>
                                         <TableHead className="pl-4">Name</TableHead>
                                         <TableHead>Key</TableHead>
-                                        <TableHead>Status</TableHead>
                                         <TableHead className="text-right pr-4">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -124,16 +117,13 @@ export default function EnvironmentsPage() {
                                                     {environment.key}
                                                 </code>
                                             </TableCell>
-                                            <TableCell>
-                                                <Badge
-                                                    variant="secondary"
-                                                    className={environment.isActive ? STATUS_BADGE_STYLES.active : STATUS_BADGE_STYLES.inactive}
-                                                >
-                                                    {environment.isActive ? "Active" : "Inactive"}
-                                                </Badge>
-                                            </TableCell>
                                             <TableCell className="text-right pr-4">
                                                 <div className="flex items-center justify-end gap-2">
+                                                    <Link href={`/flag-values?environmentId=${environment.id}`}>
+                                                        <Button variant="outline" size="sm" title="Configure Values">
+                                                            <Settings className="h-4 w-4" />
+                                                        </Button>
+                                                    </Link>
                                                     <Link href={`/environments/${environment.id}/edit`}>
                                                         <Button variant="outline" size="sm">
                                                             <Pencil className="h-4 w-4" />

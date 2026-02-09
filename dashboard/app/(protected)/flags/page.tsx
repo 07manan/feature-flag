@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useDebounce } from "use-debounce";
-import { Plus, Pencil, Search, Loader2, Trash2 } from "lucide-react";
+import { Plus, Pencil, Search, Loader2, Trash2, Settings } from "lucide-react";
 import { toast } from "sonner";
 
 import { ApiError } from "@/lib/api/client";
@@ -139,6 +139,11 @@ export default function FlagsPage() {
                                             </TableCell>
                                             <TableCell className="text-right pr-4">
                                                 <div className="flex items-center justify-end gap-2">
+                                                    <Link href={`/flag-values?flagId=${flag.id}`}>
+                                                        <Button variant="outline" size="sm" title="Configure Values">
+                                                            <Settings className="h-4 w-4" />
+                                                        </Button>
+                                                    </Link>
                                                     <Link href={`/flags/${flag.id}/edit`}>
                                                         <Button variant="outline" size="sm">
                                                             <Pencil className="h-4 w-4" />

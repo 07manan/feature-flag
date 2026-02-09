@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Flag, LayoutDashboard, Layers, Users } from "lucide-react";
+import { Flag, LayoutDashboard, Layers, Users, Sliders } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -27,6 +27,11 @@ const navItems: NavItem[] = [
         label: "Environments",
         href: "/environments",
         icon: Layers,
+    },
+    {
+        label: "Flag Values",
+        href: "/flag-values",
+        icon: Sliders,
     },
     {
         label: "Users",
