@@ -7,39 +7,39 @@ import { GoogleAuthProvider } from "@/context/GoogleAuthProvider";
 import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+    variable: "--font-geist-sans",
+    subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+    variable: "--font-geist-mono",
+    subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Feature Flags Dashboard",
-  description: "Manage your feature flags",
+    title: "Feature Flags Dashboard",
+    description: "Manage your feature flags",
 };
 
 export default function RootLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider>
-          <GoogleAuthProvider>
-            <AuthProvider>
-              {children}
-              <Toaster position="top-right" />
-            </AuthProvider>
-          </GoogleAuthProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en" suppressHydrationWarning>
+            <body
+                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+            >
+                <ThemeProvider>
+                    <GoogleAuthProvider>
+                        <AuthProvider>
+                            {children}
+                            <Toaster position="top-right" />
+                        </AuthProvider>
+                    </GoogleAuthProvider>
+                </ThemeProvider>
+            </body>
+        </html>
+    );
 }

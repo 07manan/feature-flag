@@ -3,17 +3,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function UsersPage() {
-  return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">User Management</h1>
-      <Card>
-        <CardHeader>
-          <CardTitle>Users</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Manage users and permissions here.</p>
-        </CardContent>
-      </Card>
-    </div>
-  );
+    return (
+        <div className="space-y-6">
+            <h1 className="text-2xl font-bold">User Management</h1>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Users</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground">Manage users and permissions here.</p>
+                </CardContent>
+            </Card>
+        </div>
+    );
 }

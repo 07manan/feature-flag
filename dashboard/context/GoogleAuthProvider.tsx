@@ -5,19 +5,19 @@ import config from "@/lib/config";
 import type { ReactNode } from "react";
 
 interface GoogleAuthProviderProps {
-  children: ReactNode;
+    children: ReactNode;
 }
 
 export function GoogleAuthProvider({ children }: GoogleAuthProviderProps) {
-  if (!config.googleClientId) {
-    return <>{children}</>;
-  }
+    if (!config.googleClientId) {
+        return <>{children}</>;
+    }
 
-  return (
-    <GoogleOAuthProvider clientId={config.googleClientId}>
-      {children}
-    </GoogleOAuthProvider>
-  );
+    return (
+        <GoogleOAuthProvider clientId={config.googleClientId}>
+            {children}
+        </GoogleOAuthProvider>
+    );
 }
 
 export default GoogleAuthProvider;

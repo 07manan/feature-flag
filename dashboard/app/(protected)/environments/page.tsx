@@ -15,144 +15,144 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const STATUS_BADGE_STYLES = {
-  active: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-  inactive: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
+    active: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+    inactive: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
 };
 
 export default function EnvironmentsPage() {
-  const [environments, setEnvironments] = useState<Environment[]>([]);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebounce(search, 300);
-  const [isLoading, setIsLoading] = useState(true);
+    const [environments, setEnvironments] = useState<Environment[]>([]);
+    const [search, setSearch] = useState("");
+    const [debouncedSearch] = useDebounce(search, 300);
+    const [isLoading, setIsLoading] = useState(true);
 
-  const fetchEnvironments = useCallback(async (searchQuery?: string) => {
-    setIsLoading(true);
-    try {
-      const data = await getEnvironments(searchQuery);
-      setEnvironments(data);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        toast.error("Failed to load environments", {
-          description: error.message,
-        });
-      } else {
-        toast.error("Failed to load environments", {
-          description: "An unexpected error occurred.",
-        });
-      }
-    } finally {
-      setIsLoading(false);
+    const fetchEnvironments = useCallback(async (searchQuery?: string) => {
+        setIsLoading(true);
+        try {
+            const data = await getEnvironments(searchQuery);
+            setEnvironments(data);
+        } catch (error) {
+            if (error instanceof ApiError) {
+                toast.error("Failed to load environments", {
+                    description: error.message,
+                });
+            } else {
+                toast.error("Failed to load environments", {
+                    description: "An unexpected error occurred.",
+                });
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchEnvironments(debouncedSearch || undefined);
+    }, [debouncedSearch, fetchEnvironments]);
+
+    function handleEnvironmentDeleted() {
+        fetchEnvironments(debouncedSearch || undefined);
     }
-  }, []);
 
-  useEffect(() => {
-    fetchEnvironments(debouncedSearch || undefined);
-  }, [debouncedSearch, fetchEnvironments]);
-
-  function handleEnvironmentDeleted() {
-    fetchEnvironments(debouncedSearch || undefined);
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Environments</h1>
-        <Link href="/environments/new">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Environment
-          </Button>
-        </Link>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Environments</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search environments by name or description..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
-              />
+    return (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold">Environments</h1>
+                <Link href="/environments/new">
+                    <Button>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Environment
+                    </Button>
+                </Link>
             </div>
-          </div>
 
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : environments.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">
-                {debouncedSearch
-                  ? "No environments found matching your search."
-                  : "No environments yet. Create your first environment to get started."}
-              </p>
-            </div>
-          ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="pl-4">Name</TableHead>
-                    <TableHead>Key</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right pr-4">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {environments.map((environment) => (
-                    <TableRow key={environment.id}>
-                      <TableCell className="pl-4">{environment.name}</TableCell>
-                      <TableCell>
-                        <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
-                          {environment.key}
-                        </code>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="secondary"
-                          className={environment.isActive ? STATUS_BADGE_STYLES.active : STATUS_BADGE_STYLES.inactive}
-                        >
-                          {environment.isActive ? "Active" : "Inactive"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right pr-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <Link href={`/environments/${environment.id}/edit`}>
-                            <Button variant="outline" size="sm">
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                          <DeleteEnvironmentDialog
-                            environment={environment}
-                            onDeleted={handleEnvironmentDeleted}
-                          />
+            <Card>
+                <CardHeader>
+                    <CardTitle>Environments</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="mb-4">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                            <Input
+                                placeholder="Search environments by name or description..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="pl-10"
+                            />
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
+                    </div>
+
+                    {isLoading ? (
+                        <div className="flex items-center justify-center py-8">
+                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                        </div>
+                    ) : environments.length === 0 ? (
+                        <div className="text-center py-8">
+                            <p className="text-muted-foreground">
+                                {debouncedSearch
+                                    ? "No environments found matching your search."
+                                    : "No environments yet. Create your first environment to get started."}
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="rounded-md border">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="pl-4">Name</TableHead>
+                                        <TableHead>Key</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-right pr-4">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {environments.map((environment) => (
+                                        <TableRow key={environment.id}>
+                                            <TableCell className="pl-4">{environment.name}</TableCell>
+                                            <TableCell>
+                                                <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
+                                                    {environment.key}
+                                                </code>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    variant="secondary"
+                                                    className={environment.isActive ? STATUS_BADGE_STYLES.active : STATUS_BADGE_STYLES.inactive}
+                                                >
+                                                    {environment.isActive ? "Active" : "Inactive"}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-right pr-4">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Link href={`/environments/${environment.id}/edit`}>
+                                                        <Button variant="outline" size="sm">
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                    </Link>
+                                                    <DeleteEnvironmentDialog
+                                                        environment={environment}
+                                                        onDeleted={handleEnvironmentDeleted}
+                                                    />
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
+    );
 }
