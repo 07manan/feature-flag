@@ -34,7 +34,7 @@ Flag Values represent environment-specific configurations for feature flags. Eac
 
 When a flag is evaluated in a specific environment, the evaluation service uses the variants and their percentages to determine which value a user receives.
 
-**Base URL:** `/flags/{flagId}/values`
+**Base URL:** `/flag-values`
 
 ---
 
@@ -85,6 +85,7 @@ All Flag Values API endpoints require the **ADMIN** role. Users without this rol
 
 | Field | Constraints |
 |-------|-------------|
+| `flagId` | Required for create/update, must reference an active flag |
 | `environmentId` | Required, must reference an active environment |
 | `variants` | Required, at least one variant |
 | `variants[].value` | Required, non-blank, max 500 characters, must match flag's type |
@@ -107,19 +108,25 @@ Variant values are validated against the parent flag's type:
 
 ### List Flag Values
 
-Retrieve all active flag values for a specific flag.
+Retrieve all active flag values with optional filtering by flag, environment, or search term.
 
 **Request**
 
 ```
-GET /flags/{flagId}/values
+GET /flag-values
+GET /flag-values?flagId={flagId}
+GET /flag-values?environmentId={environmentId}
+GET /flag-values?search={searchTerm}
+GET /flag-values?flagId={flagId}&environmentId={environmentId}&search={searchTerm}
 ```
 
-**Path Parameters**
+**Query Parameters**
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `flagId` | `UUID` | Yes | The parent flag's unique identifier |
+| `flagId` | `UUID` | No | Filter by a specific flag's unique identifier |
+| `environmentId` | `UUID` | No | Filter by a specific environment's unique identifier |
+| `search` | `string` | No | Case-insensitive partial match on flag key, flag name, environment key, or environment name |
 
 **Response**
 
@@ -174,11 +181,11 @@ Content-Type: application/json
 ]
 ```
 
-**Error Responses**
+**Notes**
 
-| Status | Condition |
-|--------|-----------|
-| `404 Not Found` | Flag not found or has been deleted |
+- When no filters are provided, returns all active flag values
+- Multiple filters can be combined and are applied with AND logic
+- Search matches against flag key, flag name, environment key, and environment name
 
 ---
 
@@ -189,14 +196,13 @@ Retrieve a single flag value by ID.
 **Request**
 
 ```
-GET /flags/{flagId}/values/{id}
+GET /flag-values/{id}
 ```
 
 **Path Parameters**
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `flagId` | `UUID` | Yes | The parent flag's unique identifier |
 | `id` | `UUID` | Yes | The flag value's unique identifier |
 
 **Response**
@@ -236,8 +242,7 @@ Content-Type: application/json
 
 | Status | Condition |
 |--------|-----------|
-| `404 Not Found` | Flag not found or has been deleted |
-| `404 Not Found` | Flag value not found, deleted, or belongs to a different flag |
+| `404 Not Found` | Flag value not found or has been deleted |
 
 ---
 
@@ -248,12 +253,13 @@ Create a new flag value for a specific environment.
 **Request**
 
 ```
-POST /flags/{flagId}/values
+POST /flag-values
 Content-Type: application/json
 ```
 
 ```json
 {
+  "flagId": "550e8400-e29b-41d4-a716-446655440000",
   "environmentId": "770e8400-e29b-41d4-a716-446655440000",
   "variants": [
     {
@@ -268,16 +274,11 @@ Content-Type: application/json
 }
 ```
 
-**Path Parameters**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `flagId` | `UUID` | Yes | The parent flag's unique identifier |
-
 **Request Body**
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
+| `flagId` | `UUID` | Yes | The parent flag's unique identifier |
 | `environmentId` | `UUID` | Yes | Target environment's unique identifier |
 | `variants` | `Variant[]` | Yes | List of value variants |
 | `variants[].value` | `string` | Yes | The value (must match flag's type) |
@@ -371,12 +372,13 @@ Update the variants for an existing flag value. This is a full replacement opera
 **Request**
 
 ```
-PUT /flags/{flagId}/values/{id}
+PUT /flag-values/{id}
 Content-Type: application/json
 ```
 
 ```json
 {
+  "flagId": "550e8400-e29b-41d4-a716-446655440000",
   "environmentId": "770e8400-e29b-41d4-a716-446655440000",
   "variants": [
     {
@@ -395,19 +397,19 @@ Content-Type: application/json
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `flagId` | `UUID` | Yes | The parent flag's unique identifier |
 | `id` | `UUID` | Yes | The flag value's unique identifier |
 
 **Request Body**
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
+| `flagId` | `UUID` | Yes | The parent flag's ID (must match existing, cannot change) |
 | `environmentId` | `UUID` | Yes | Environment ID (must match existing, cannot change) |
 | `variants` | `Variant[]` | Yes | New list of value variants (replaces all existing) |
 | `variants[].value` | `string` | Yes | The value (must match flag's type) |
 | `variants[].percentage` | `integer` | Yes | Distribution percentage (0-100) |
 
-> **Note:** The `environmentId` cannot be changed. To move a flag value to a different environment, delete it and create a new one.
+> **Note:** The `flagId` and `environmentId` cannot be changed. To move a flag value to a different flag or environment, delete it and create a new one.
 
 **Response**
 
@@ -449,8 +451,8 @@ Content-Type: application/json
 | `400 Bad Request` | Validation failed |
 | `400 Bad Request` | Percentages do not sum to 100 |
 | `400 Bad Request` | Variant value is not valid for the flag's type |
-| `404 Not Found` | Flag not found or has been deleted |
-| `404 Not Found` | Flag value not found, deleted, or belongs to a different flag |
+| `400 Bad Request` | Flag ID cannot be changed |
+| `404 Not Found` | Flag value not found or has been deleted |
 
 ---
 
@@ -461,14 +463,13 @@ Soft delete a flag value. The flag value becomes inactive and will not be return
 **Request**
 
 ```
-DELETE /flags/{flagId}/values/{id}
+DELETE /flag-values/{id}
 ```
 
 **Path Parameters**
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `flagId` | `UUID` | Yes | The parent flag's unique identifier |
 | `id` | `UUID` | Yes | The flag value's unique identifier |
 
 **Response**
@@ -481,8 +482,7 @@ HTTP/1.1 204 No Content
 
 | Status | Condition |
 |--------|-----------|
-| `404 Not Found` | Flag not found or has been deleted |
-| `404 Not Found` | Flag value not found, already deleted, or belongs to a different flag |
+| `404 Not Found` | Flag value not found or already deleted |
 
 ---
 
@@ -508,6 +508,7 @@ When request body validation fails, the API returns a structured error response:
 
 | Field | Message |
 |-------|---------|
+| `flagId` | "Flag ID is required" |
 | `environmentId` | "Environment ID is required" |
 | `variants` | "At least one variant is required" |
 | `variants` | "Percentages must sum to 100, got: {sum}" |
@@ -554,10 +555,11 @@ When request body validation fails, the API returns a structured error response:
 **Step 1: Initial 10% rollout**
 
 ```bash
-curl -X POST "http://localhost:8080/flags/{flagId}/values" \
+curl -X POST "http://localhost:8080/flag-values" \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{
+    "flagId": "{flagId}",
     "environmentId": "{productionEnvId}",
     "variants": [
       {"value": "true", "percentage": 10},
@@ -569,10 +571,11 @@ curl -X POST "http://localhost:8080/flags/{flagId}/values" \
 **Step 2: Expand to 50%**
 
 ```bash
-curl -X PUT "http://localhost:8080/flags/{flagId}/values/{flagValueId}" \
+curl -X PUT "http://localhost:8080/flag-values/{flagValueId}" \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{
+    "flagId": "{flagId}",
     "environmentId": "{productionEnvId}",
     "variants": [
       {"value": "true", "percentage": 50},
@@ -584,10 +587,11 @@ curl -X PUT "http://localhost:8080/flags/{flagId}/values/{flagValueId}" \
 **Step 3: Full rollout**
 
 ```bash
-curl -X PUT "http://localhost:8080/flags/{flagId}/values/{flagValueId}" \
+curl -X PUT "http://localhost:8080/flag-values/{flagValueId}" \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{
+    "flagId": "{flagId}",
     "environmentId": "{productionEnvId}",
     "variants": [
       {"value": "true", "percentage": 100}
@@ -598,10 +602,11 @@ curl -X PUT "http://localhost:8080/flags/{flagId}/values/{flagValueId}" \
 ### A/B/C Testing with STRING Flag
 
 ```bash
-curl -X POST "http://localhost:8080/flags/{flagId}/values" \
+curl -X POST "http://localhost:8080/flag-values" \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{
+    "flagId": "{flagId}",
     "environmentId": "{productionEnvId}",
     "variants": [
       {"value": "variant-a", "percentage": 33},
@@ -614,10 +619,11 @@ curl -X POST "http://localhost:8080/flags/{flagId}/values" \
 ### Numeric Value Experiment
 
 ```bash
-curl -X POST "http://localhost:8080/flags/{flagId}/values" \
+curl -X POST "http://localhost:8080/flag-values" \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{
+    "flagId": "{flagId}",
     "environmentId": "{productionEnvId}",
     "variants": [
       {"value": "5", "percentage": 25},
@@ -631,13 +637,44 @@ curl -X POST "http://localhost:8080/flags/{flagId}/values" \
 ### Kill Switch (0% of new feature)
 
 ```bash
-curl -X PUT "http://localhost:8080/flags/{flagId}/values/{flagValueId}" \
+curl -X PUT "http://localhost:8080/flag-values/{flagValueId}" \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{
+    "flagId": "{flagId}",
     "environmentId": "{productionEnvId}",
     "variants": [
       {"value": "false", "percentage": 100}
     ]
   }'
+```
+
+### Search for Flag Values
+
+**Get all flag values for a specific flag:**
+
+```bash
+curl -X GET "http://localhost:8080/flag-values?flagId={flagId}" \
+  -H "Authorization: Bearer {token}"
+```
+
+**Get all flag values for a specific environment:**
+
+```bash
+curl -X GET "http://localhost:8080/flag-values?environmentId={environmentId}" \
+  -H "Authorization: Bearer {token}"
+```
+
+**Search by flag or environment name:**
+
+```bash
+curl -X GET "http://localhost:8080/flag-values?search=checkout" \
+  -H "Authorization: Bearer {token}"
+```
+
+**Combined filters:**
+
+```bash
+curl -X GET "http://localhost:8080/flag-values?flagId={flagId}&environmentId={environmentId}" \
+  -H "Authorization: Bearer {token}"
 ```

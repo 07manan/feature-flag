@@ -36,4 +36,21 @@ public interface FlagValueRepository extends JpaRepository<FlagValue, UUID> {
     @Modifying
     @Query("UPDATE FlagValue fv SET fv.isActive = false WHERE fv.environment.id = :environmentId AND fv.isActive = true")
     int deactivateByEnvironmentId(@Param("environmentId") UUID environmentId);
+
+    @EntityGraph(attributePaths = {"flag", "environment", "variants"})
+    @Query("""
+        SELECT fv FROM FlagValue fv
+        WHERE fv.isActive = true
+        AND (:flagId IS NULL OR fv.flag.id = :flagId)
+        AND (:environmentId IS NULL OR fv.environment.id = :environmentId)
+        AND (:search IS NULL OR :search = ''
+            OR LOWER(fv.flag.key) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(fv.flag.name) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(fv.environment.key) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(fv.environment.name) LIKE LOWER(CONCAT('%', :search, '%')))
+        """)
+    List<FlagValue> findAllWithFilters(
+            @Param("flagId") UUID flagId,
+            @Param("environmentId") UUID environmentId,
+            @Param("search") String search);
 }

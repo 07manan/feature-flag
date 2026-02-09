@@ -22,6 +22,7 @@ public class FlagValueDto {
 
     private UUID id;
 
+    @NotNull(message = "Flag ID is required")
     private UUID flagId;
 
     private String flagKey;

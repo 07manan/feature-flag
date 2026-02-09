@@ -22,27 +22,22 @@ public class FlagValueService {
     private final FlagRepository flagRepository;
     private final EnvironmentRepository environmentRepository;
 
-    public List<FlagValueDto> getAllByFlagId(UUID flagId) {
-        validateFlagExists(flagId);
-        return flagValueRepository.findAllByFlagIdAndIsActiveTrue(flagId).stream()
+    public List<FlagValueDto> getAll(UUID flagId, UUID environmentId, String search) {
+        return flagValueRepository.findAllWithFilters(flagId, environmentId, search).stream()
                 .map(FlagValueDto::from)
                 .toList();
     }
 
-    public FlagValueDto getById(UUID flagId, UUID id) {
-        validateFlagExists(flagId);
+    public FlagValueDto getById(UUID id) {
         FlagValue flagValue = flagValueRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FlagValue", "id", id));
-
-        if (!flagValue.getFlag().getId().equals(flagId)) {
-            throw new ResourceNotFoundException("FlagValue", "id", id);
-        }
 
         return FlagValueDto.from(flagValue);
     }
 
     @Transactional
-    public FlagValueDto create(UUID flagId, FlagValueDto request) {
+    public FlagValueDto create(FlagValueDto request) {
+        UUID flagId = request.getFlagId();
         Flag flag = flagRepository.findByIdAndIsActiveTrue(flagId)
                 .orElseThrow(() -> new ResourceNotFoundException("Flag", "id", flagId));
 
@@ -73,14 +68,13 @@ public class FlagValueService {
     }
 
     @Transactional
-    public FlagValueDto update(UUID flagId, UUID id, FlagValueDto request) {
-        validateFlagExists(flagId);
-        
+    public FlagValueDto update(UUID id, FlagValueDto request) {
         FlagValue flagValue = flagValueRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FlagValue", "id", id));
 
-        if (!flagValue.getFlag().getId().equals(flagId)) {
-            throw new ResourceNotFoundException("FlagValue", "id", id);
+        // Validate flagId matches the existing flag value
+        if (!flagValue.getFlag().getId().equals(request.getFlagId())) {
+            throw new IllegalArgumentException("Flag ID cannot be changed");
         }
 
         validateVariantValues(flagValue.getFlag().getType(), request.getVariants());
@@ -97,24 +91,12 @@ public class FlagValueService {
     }
 
     @Transactional
-    public void delete(UUID flagId, UUID id) {
-        validateFlagExists(flagId);
-        
+    public void delete(UUID id) {
         FlagValue flagValue = flagValueRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FlagValue", "id", id));
 
-        if (!flagValue.getFlag().getId().equals(flagId)) {
-            throw new ResourceNotFoundException("FlagValue", "id", id);
-        }
-
         flagValue.setIsActive(false);
         flagValueRepository.save(flagValue);
-    }
-
-    private void validateFlagExists(UUID flagId) {
-        if (!flagRepository.existsById(flagId)) {
-            throw new ResourceNotFoundException("Flag", "id", flagId);
-        }
     }
 
     private void validateVariantValues(FlagType type, List<FlagValueVariantDto> variants) {

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/flags/{flagId}/values")
+@RequestMapping("/flag-values")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 public class FlagValueController {
@@ -21,38 +21,34 @@ public class FlagValueController {
     private final FlagValueService flagValueService;
 
     @GetMapping
-    public ResponseEntity<List<FlagValueDto>> getAllByFlagId(@PathVariable UUID flagId) {
-        return ResponseEntity.ok(flagValueService.getAllByFlagId(flagId));
+    public ResponseEntity<List<FlagValueDto>> getAll(
+            @RequestParam(required = false) UUID flagId,
+            @RequestParam(required = false) UUID environmentId,
+            @RequestParam(required = false) String search) {
+        return ResponseEntity.ok(flagValueService.getAll(flagId, environmentId, search));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FlagValueDto> getById(
-            @PathVariable UUID flagId,
-            @PathVariable UUID id) {
-        return ResponseEntity.ok(flagValueService.getById(flagId, id));
+    public ResponseEntity<FlagValueDto> getById(@PathVariable UUID id) {
+        return ResponseEntity.ok(flagValueService.getById(id));
     }
 
     @PostMapping
-    public ResponseEntity<FlagValueDto> create(
-            @PathVariable UUID flagId,
-            @Valid @RequestBody FlagValueDto request) {
-        FlagValueDto created = flagValueService.create(flagId, request);
+    public ResponseEntity<FlagValueDto> create(@Valid @RequestBody FlagValueDto request) {
+        FlagValueDto created = flagValueService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<FlagValueDto> update(
-            @PathVariable UUID flagId,
             @PathVariable UUID id,
             @Valid @RequestBody FlagValueDto request) {
-        return ResponseEntity.ok(flagValueService.update(flagId, id, request));
+        return ResponseEntity.ok(flagValueService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
-            @PathVariable UUID flagId,
-            @PathVariable UUID id) {
-        flagValueService.delete(flagId, id);
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        flagValueService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
