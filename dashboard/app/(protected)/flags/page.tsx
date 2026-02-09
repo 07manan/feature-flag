@@ -110,17 +110,17 @@ export default function FlagsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead className="pl-4">Name</TableHead>
                     <TableHead>Key</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Default Value</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-right pr-4">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {flags.map((flag) => (
                     <TableRow key={flag.id}>
-                      <TableCell>{flag.name}</TableCell>
+                      <TableCell className="pl-4">{flag.name}</TableCell>
                       <TableCell>
                         <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
                           {flag.key}
@@ -137,7 +137,7 @@ export default function FlagsPage() {
                       <TableCell className="font-mono text-sm max-w-[200px] truncate">
                         {flag.defaultValue}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right pr-4">
                         <div className="flex items-center justify-end gap-2">
                           <Link href={`/flags/${flag.id}/edit`}>
                             <Button variant="outline" size="sm">
