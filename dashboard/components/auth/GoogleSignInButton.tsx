@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { toast } from "sonner";
 
 import { useAuth } from "@/context/AuthContext";
@@ -11,6 +12,7 @@ import { ApiError } from "@/lib/api/client";
 export function GoogleSignInButton() {
   const router = useRouter();
   const { oauthLogin } = useAuth();
+  const { resolvedTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleSuccess(credentialResponse: CredentialResponse) {
@@ -56,7 +58,7 @@ export function GoogleSignInButton() {
         onSuccess={handleSuccess}
         onError={handleError}
         useOneTap={false}
-        theme="outline"
+        theme={resolvedTheme === "dark" ? "filled_black" : "outline"}
         size="large"
         width="100%"
         text="continue_with"
