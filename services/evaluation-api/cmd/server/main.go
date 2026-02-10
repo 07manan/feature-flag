@@ -56,21 +56,31 @@ func main() {
 	}
 	logger.Info("connected to database")
 
-	// Initialize Redis cache
+	// Initialize L1 (memory) cache
+	memoryCache, err := cache.NewMemoryCache(cfg.MemoryCache, logger)
+	if err != nil {
+		logger.Error("failed to initialize memory cache", "error", err)
+		os.Exit(1)
+	}
+
+	// Initialize L2 (Redis) cache
 	redisCache, err := cache.NewRedisCache(cfg.Redis, logger)
 	if err != nil {
 		logger.Error("failed to connect to redis", "error", err)
 		os.Exit(1)
 	}
-	defer redisCache.Close()
+
+	// Create tiered cache (L1 + L2)
+	tieredCache := cache.NewTieredCache(memoryCache, redisCache, logger)
+	defer tieredCache.Close()
 
 	// Start cache invalidation subscriber
-	sub := subscriber.New(redisCache.Client(), redisCache, logger)
+	sub := subscriber.New(tieredCache.Client(), tieredCache, logger)
 	sub.Start(ctx)
 	defer sub.Stop()
 
 	repo := repository.New(pool)
-	svc := service.New(repo, redisCache, logger)
+	svc := service.New(repo, tieredCache, logger)
 	h := handler.New(svc, logger)
 	router := handler.NewRouter(h, logger)
 

@@ -8,9 +8,10 @@ import (
 )
 
 type Config struct {
-	Server   ServerConfig
-	Database DatabaseConfig
-	Redis    RedisConfig
+	Server      ServerConfig
+	Database    DatabaseConfig
+	Redis       RedisConfig
+	MemoryCache MemoryCacheConfig
 }
 
 type ServerConfig struct {
@@ -42,6 +43,12 @@ type RedisConfig struct {
 	PoolSize int
 }
 
+type MemoryCacheConfig struct {
+	MaxSize     int64         // Maximum size in bytes (default 100MB)
+	TTL         time.Duration // TTL for memory cache entries (shorter than Redis)
+	NumCounters int64         // Number of keys to track for frequency (10x expected items)
+}
+
 func Load() (*Config, error) {
 	cfg := &Config{
 		Server: ServerConfig{
@@ -70,6 +77,11 @@ func Load() (*Config, error) {
 			TTL:      getEnvDuration("REDIS_TTL", 5*time.Minute),
 			PoolSize: getEnvInt("REDIS_POOL_SIZE", 10),
 		},
+		MemoryCache: MemoryCacheConfig{
+			MaxSize:     getEnvInt64("MEMORY_CACHE_MAX_SIZE", 100*1024*1024), // 100MB
+			TTL:         getEnvDuration("MEMORY_CACHE_TTL", 30*time.Second),
+			NumCounters: getEnvInt64("MEMORY_CACHE_NUM_COUNTERS", 100000),
+		},
 	}
 
 	return cfg, nil
@@ -97,6 +109,15 @@ func getEnvString(key, defaultValue string) string {
 func getEnvInt(key string, defaultValue int) int {
 	if value := os.Getenv(key); value != "" {
 		if intVal, err := strconv.Atoi(value); err == nil {
+			return intVal
+		}
+	}
+	return defaultValue
+}
+
+func getEnvInt64(key string, defaultValue int64) int64 {
+	if value := os.Getenv(key); value != "" {
+		if intVal, err := strconv.ParseInt(value, 10, 64); err == nil {
 			return intVal
 		}
 	}

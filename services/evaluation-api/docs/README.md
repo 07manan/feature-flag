@@ -5,6 +5,8 @@ A high-performance, read-only Go API service for evaluating feature flags. Desig
 ## Features
 
 - **Fast Flag Evaluation**: Direct PostgreSQL queries optimized for read performance
+- **Two-Tier Caching**: L1 in-memory cache (sub-millisecond) + L2 Redis cache (cross-instance)
+- **Real-Time Invalidation**: Redis Pub/Sub for instant cache updates across instances
 - **Percentage Rollout**: Deterministic user bucketing using MurmurHash3
 - **API Key Authentication**: Environment-scoped access via `X-API-Key` header
 - **Bulk Evaluation**: Evaluate all flags in a single request
@@ -139,6 +141,25 @@ Environment variables:
 | `DB_MAX_CONNS` | `25` | Maximum database connections |
 | `DB_MIN_CONNS` | `5` | Minimum database connections |
 
+### Redis Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `REDIS_HOST` | `localhost` | Redis host |
+| `REDIS_PORT` | `6379` | Redis port |
+| `REDIS_PASSWORD` | `` | Redis password (optional) |
+| `REDIS_DB` | `0` | Redis database number |
+| `REDIS_TTL` | `5m` | L2 cache TTL (Redis) |
+| `REDIS_POOL_SIZE` | `10` | Redis connection pool size |
+
+### Memory Cache Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MEMORY_CACHE_MAX_SIZE` | `104857600` | L1 cache max size in bytes (100MB) |
+| `MEMORY_CACHE_TTL` | `30s` | L1 cache TTL (memory) |
+| `MEMORY_CACHE_NUM_COUNTERS` | `100000` | Number of keys to track for LRU |
+
 ## Running Locally
 
 ```bash
@@ -165,8 +186,50 @@ docker run -p 8081:8081 \
   -e DB_USER=postgres \
   -e DB_PASSWORD=postgres \
   -e DB_NAME=featureflags \
+  -e REDIS_HOST=host.docker.internal \
+  -e REDIS_PORT=6379 \
   evaluation-api
 ```
+
+## Caching
+
+The evaluation API uses a two-tier caching strategy for optimal performance:
+
+### Cache Layers
+
+| Layer | Storage | TTL | Latency | Scope |
+|-------|---------|-----|---------|-------|
+| **L1** | In-memory (ristretto) | 30s | <0.1ms | Per-instance |
+| **L2** | Redis | 5m | ~1-2ms | Cross-instance |
+
+### Cache Flow
+
+```
+Request → L1 Hit? → Return (fastest)
+            ↓ miss
+          L2 Hit? → Populate L1 → Return
+            ↓ miss
+          Database → Populate L1 & L2 → Return
+```
+
+### Cache Invalidation
+
+When flags are updated via the Admin API:
+
+1. Admin API publishes event to Redis Pub/Sub
+2. All evaluation API instances receive the event
+3. Both L1 and L2 caches are invalidated
+4. Next request fetches fresh data from database
+
+### Cached Data
+
+| Data | Cache Key Pattern | Notes |
+|------|-------------------|-------|
+| Environment by API key | `env:apikey:{apiKey}` | Authenticated on every request |
+| Flag by key | `flag:key:{flagKey}` | Single flag evaluation |
+| All active flags | `flags:active` | Bulk evaluation |
+| Flag values for environment | `flagvalues:env:{envID}` | Environment overrides |
+| Variants | `variants:fv:{flagValueID}` | Percentage rollout variants |
 
 ## Percentage Rollout
 
@@ -196,6 +259,14 @@ This ensures:
 │  • API key authentication                                   │
 │  • Flag evaluation logic                                    │
 │  • Percentage rollout (MurmurHash3)                         │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                      Cache Layer                            │
+│  • L1: In-memory (ristretto) - <0.1ms                       │
+│  • L2: Redis - ~1-2ms                                       │
+│  • Pub/Sub invalidation from Admin API                      │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
