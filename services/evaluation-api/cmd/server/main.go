@@ -11,10 +11,12 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"github.com/manan/feature-flag/evaluation-api/internal/cache"
 	"github.com/manan/feature-flag/evaluation-api/internal/config"
 	"github.com/manan/feature-flag/evaluation-api/internal/handler"
 	"github.com/manan/feature-flag/evaluation-api/internal/repository"
 	"github.com/manan/feature-flag/evaluation-api/internal/service"
+	"github.com/manan/feature-flag/evaluation-api/internal/subscriber"
 )
 
 func main() {
@@ -54,8 +56,21 @@ func main() {
 	}
 	logger.Info("connected to database")
 
+	// Initialize Redis cache
+	redisCache, err := cache.NewRedisCache(cfg.Redis, logger)
+	if err != nil {
+		logger.Error("failed to connect to redis", "error", err)
+		os.Exit(1)
+	}
+	defer redisCache.Close()
+
+	// Start cache invalidation subscriber
+	sub := subscriber.New(redisCache.Client(), redisCache, logger)
+	sub.Start(ctx)
+	defer sub.Stop()
+
 	repo := repository.New(pool)
-	svc := service.New(repo)
+	svc := service.New(repo, redisCache, logger)
 	h := handler.New(svc, logger)
 	router := handler.NewRouter(h, logger)
 

@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"strconv"
 
 	"github.com/google/uuid"
 
+	"github.com/manan/feature-flag/evaluation-api/internal/cache"
 	"github.com/manan/feature-flag/evaluation-api/internal/domain"
 	"github.com/manan/feature-flag/evaluation-api/internal/repository"
 	"github.com/manan/feature-flag/evaluation-api/pkg/hash"
@@ -20,11 +22,17 @@ var (
 )
 
 type EvaluationService struct {
-	repo *repository.Repository
+	repo   *repository.Repository
+	cache  cache.Cache
+	logger *slog.Logger
 }
 
-func New(repo *repository.Repository) *EvaluationService {
-	return &EvaluationService{repo: repo}
+func New(repo *repository.Repository, c cache.Cache, logger *slog.Logger) *EvaluationService {
+	return &EvaluationService{
+		repo:   repo,
+		cache:  c,
+		logger: logger,
+	}
 }
 
 func (s *EvaluationService) AuthenticateAPIKey(ctx context.Context, apiKey string) (*domain.Environment, error) {
@@ -32,7 +40,17 @@ func (s *EvaluationService) AuthenticateAPIKey(ctx context.Context, apiKey strin
 		return nil, ErrInvalidAPIKey
 	}
 
-	env, err := s.repo.GetEnvironmentByAPIKey(ctx, apiKey)
+	// Try cache first
+	cacheKey := cache.EnvByAPIKeyKey(apiKey)
+	var env domain.Environment
+	if s.cache != nil {
+		if err := s.cache.Get(ctx, cacheKey, &env); err == nil {
+			return &env, nil
+		}
+	}
+
+	// Cache miss - query database
+	envPtr, err := s.repo.GetEnvironmentByAPIKey(ctx, apiKey)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFound) {
 			return nil, ErrInvalidAPIKey
@@ -40,11 +58,18 @@ func (s *EvaluationService) AuthenticateAPIKey(ctx context.Context, apiKey strin
 		return nil, err
 	}
 
-	return env, nil
+	// Store in cache
+	if s.cache != nil {
+		if err := s.cache.Set(ctx, cacheKey, envPtr); err != nil {
+			s.logger.Warn("failed to cache environment", "error", err, "key", cacheKey)
+		}
+	}
+
+	return envPtr, nil
 }
 
 func (s *EvaluationService) EvaluateFlag(ctx context.Context, env *domain.Environment, flagKey string, userID string) (*domain.EvaluationResult, error) {
-	flag, err := s.repo.GetFlagByKey(ctx, flagKey)
+	flag, err := s.getFlagByKey(ctx, flagKey)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFound) {
 			return nil, ErrFlagNotFound
@@ -52,7 +77,7 @@ func (s *EvaluationService) EvaluateFlag(ctx context.Context, env *domain.Enviro
 		return nil, err
 	}
 
-	flagValue, err := s.repo.GetFlagValue(ctx, flag.ID, env.ID)
+	flagValue, err := s.getFlagValue(ctx, flag.ID, env.ID)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFound) {
 			// No environment-specific override, use default value
@@ -61,7 +86,7 @@ func (s *EvaluationService) EvaluateFlag(ctx context.Context, env *domain.Enviro
 		return nil, err
 	}
 
-	variants, err := s.repo.GetFlagValueVariants(ctx, flagValue.ID)
+	variants, err := s.getFlagValueVariants(ctx, flagValue.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -80,12 +105,12 @@ func (s *EvaluationService) EvaluateFlag(ctx context.Context, env *domain.Enviro
 }
 
 func (s *EvaluationService) EvaluateAllFlags(ctx context.Context, env *domain.Environment, userID string) (*domain.BulkEvaluationResult, error) {
-	flags, err := s.repo.GetAllActiveFlags(ctx)
+	flags, err := s.getAllActiveFlags(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	flagValues, err := s.repo.GetFlagValuesForEnvironment(ctx, env.ID)
+	flagValues, err := s.getFlagValuesForEnvironment(ctx, env.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +130,7 @@ func (s *EvaluationService) EvaluateAllFlags(ctx context.Context, env *domain.En
 			continue
 		}
 
-		variants, err := s.repo.GetFlagValueVariants(ctx, flagValue.ID)
+		variants, err := s.getFlagValueVariants(ctx, flagValue.ID)
 		if err != nil {
 			continue // Skip on error
 		}
@@ -212,4 +237,144 @@ func (s *EvaluationService) createResult(flagKey, rawValue string, flagType doma
 
 func (s *EvaluationService) CheckHealth(ctx context.Context) error {
 	return s.repo.Ping(ctx)
+}
+
+// getFlagByKey retrieves a flag by key, using cache if available
+func (s *EvaluationService) getFlagByKey(ctx context.Context, flagKey string) (*domain.Flag, error) {
+	cacheKey := cache.FlagByKeyKey(flagKey)
+
+	// Try cache first
+	var flag domain.Flag
+	if s.cache != nil {
+		if err := s.cache.Get(ctx, cacheKey, &flag); err == nil {
+			return &flag, nil
+		}
+	}
+
+	// Cache miss - query database
+	flagPtr, err := s.repo.GetFlagByKey(ctx, flagKey)
+	if err != nil {
+		return nil, err
+	}
+
+	// Store in cache
+	if s.cache != nil {
+		if err := s.cache.Set(ctx, cacheKey, flagPtr); err != nil {
+			s.logger.Warn("failed to cache flag", "error", err, "key", cacheKey)
+		}
+	}
+
+	return flagPtr, nil
+}
+
+// getAllActiveFlags retrieves all active flags, using cache if available
+func (s *EvaluationService) getAllActiveFlags(ctx context.Context) ([]domain.Flag, error) {
+	cacheKey := cache.KeyAllActiveFlags
+
+	// Try cache first
+	var flags []domain.Flag
+	if s.cache != nil {
+		if err := s.cache.Get(ctx, cacheKey, &flags); err == nil {
+			return flags, nil
+		}
+	}
+
+	// Cache miss - query database
+	flags, err := s.repo.GetAllActiveFlags(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Store in cache
+	if s.cache != nil {
+		if err := s.cache.Set(ctx, cacheKey, flags); err != nil {
+			s.logger.Warn("failed to cache all flags", "error", err, "key", cacheKey)
+		}
+	}
+
+	return flags, nil
+}
+
+// getFlagValue retrieves a flag value, using cache if available
+func (s *EvaluationService) getFlagValue(ctx context.Context, flagID, envID uuid.UUID) (*domain.FlagValue, error) {
+	cacheKey := cache.FlagValueKey(flagID.String(), envID.String())
+
+	// Try cache first
+	var fv domain.FlagValue
+	if s.cache != nil {
+		if err := s.cache.Get(ctx, cacheKey, &fv); err == nil {
+			return &fv, nil
+		}
+	}
+
+	// Cache miss - query database
+	fvPtr, err := s.repo.GetFlagValue(ctx, flagID, envID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Store in cache
+	if s.cache != nil {
+		if err := s.cache.Set(ctx, cacheKey, fvPtr); err != nil {
+			s.logger.Warn("failed to cache flag value", "error", err, "key", cacheKey)
+		}
+	}
+
+	return fvPtr, nil
+}
+
+// getFlagValuesForEnvironment retrieves all flag values for an environment, using cache if available
+func (s *EvaluationService) getFlagValuesForEnvironment(ctx context.Context, envID uuid.UUID) (map[string]*domain.FlagValue, error) {
+	cacheKey := cache.FlagValuesEnvKey(envID.String())
+
+	// Try cache first
+	var flagValues map[string]*domain.FlagValue
+	if s.cache != nil {
+		if err := s.cache.Get(ctx, cacheKey, &flagValues); err == nil {
+			return flagValues, nil
+		}
+	}
+
+	// Cache miss - query database
+	flagValues, err := s.repo.GetFlagValuesForEnvironment(ctx, envID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Store in cache
+	if s.cache != nil {
+		if err := s.cache.Set(ctx, cacheKey, flagValues); err != nil {
+			s.logger.Warn("failed to cache flag values for env", "error", err, "key", cacheKey)
+		}
+	}
+
+	return flagValues, nil
+}
+
+// getFlagValueVariants retrieves variants for a flag value, using cache if available
+func (s *EvaluationService) getFlagValueVariants(ctx context.Context, flagValueID uuid.UUID) ([]domain.FlagValueVariant, error) {
+	cacheKey := cache.VariantsKey(flagValueID.String())
+
+	// Try cache first
+	var variants []domain.FlagValueVariant
+	if s.cache != nil {
+		if err := s.cache.Get(ctx, cacheKey, &variants); err == nil {
+			return variants, nil
+		}
+	}
+
+	// Cache miss - query database
+	variants, err := s.repo.GetFlagValueVariants(ctx, flagValueID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Store in cache
+	if s.cache != nil {
+		if err := s.cache.Set(ctx, cacheKey, variants); err != nil {
+			s.logger.Warn("failed to cache variants", "error", err, "key", cacheKey)
+		}
+	}
+
+	return variants, nil
 }

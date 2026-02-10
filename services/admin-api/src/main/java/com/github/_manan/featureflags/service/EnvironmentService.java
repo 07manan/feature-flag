@@ -2,6 +2,7 @@ package com.github._manan.featureflags.service;
 
 import com.github._manan.featureflags.dto.EnvironmentDto;
 import com.github._manan.featureflags.entity.Environment;
+import com.github._manan.featureflags.event.CacheInvalidationPublisher;
 import com.github._manan.featureflags.exception.ResourceNotFoundException;
 import com.github._manan.featureflags.repository.EnvironmentRepository;
 import com.github._manan.featureflags.repository.FlagValueRepository;
@@ -19,6 +20,7 @@ public class EnvironmentService {
 
     private final EnvironmentRepository environmentRepository;
     private final FlagValueRepository flagValueRepository;
+    private final CacheInvalidationPublisher cacheInvalidationPublisher;
 
     public List<EnvironmentDto> getAll(String search) {
         List<Environment> environments;
@@ -84,6 +86,7 @@ public class EnvironmentService {
         
         environment.setIsActive(false);
         environmentRepository.save(environment);
+        cacheInvalidationPublisher.publishEnvironmentDeleted(environment.getKey(), environment.getId());
     }
 
     @Transactional
@@ -93,6 +96,7 @@ public class EnvironmentService {
 
         environment.setApiKey(generateUniqueApiKey(environment.getKey()));
         environment = environmentRepository.save(environment);
+        cacheInvalidationPublisher.publishEnvironmentApiKeyRegenerated(environment.getKey(), environment.getId());
         return EnvironmentDto.from(environment);
     }
 

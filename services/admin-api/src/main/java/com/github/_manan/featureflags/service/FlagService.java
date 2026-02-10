@@ -3,6 +3,7 @@ package com.github._manan.featureflags.service;
 import com.github._manan.featureflags.dto.FlagDto;
 import com.github._manan.featureflags.entity.Flag;
 import com.github._manan.featureflags.entity.FlagType;
+import com.github._manan.featureflags.event.CacheInvalidationPublisher;
 import com.github._manan.featureflags.exception.ResourceNotFoundException;
 import com.github._manan.featureflags.repository.FlagRepository;
 import com.github._manan.featureflags.repository.FlagValueRepository;
@@ -19,6 +20,7 @@ public class FlagService {
 
     private final FlagRepository flagRepository;
     private final FlagValueRepository flagValueRepository;
+    private final CacheInvalidationPublisher cacheInvalidationPublisher;
 
     public List<FlagDto> getAllFlags(String search) {
         List<Flag> flags;
@@ -57,6 +59,7 @@ public class FlagService {
                 .build();
 
         Flag savedFlag = flagRepository.save(flag);
+        cacheInvalidationPublisher.publishFlagCreated(savedFlag.getKey());
         return FlagDto.from(savedFlag);
     }
 
@@ -79,6 +82,7 @@ public class FlagService {
         }
 
         Flag savedFlag = flagRepository.save(flag);
+        cacheInvalidationPublisher.publishFlagUpdated(savedFlag.getKey());
         return FlagDto.from(savedFlag);
     }
 
@@ -91,6 +95,7 @@ public class FlagService {
         
         flag.setIsActive(false);
         flagRepository.save(flag);
+        cacheInvalidationPublisher.publishFlagDeleted(flag.getKey());
     }
 
     private void validateDefaultValue(FlagType type, String defaultValue) {

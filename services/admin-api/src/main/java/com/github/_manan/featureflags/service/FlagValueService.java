@@ -3,6 +3,7 @@ package com.github._manan.featureflags.service;
 import com.github._manan.featureflags.dto.FlagValueDto;
 import com.github._manan.featureflags.dto.FlagValueVariantDto;
 import com.github._manan.featureflags.entity.*;
+import com.github._manan.featureflags.event.CacheInvalidationPublisher;
 import com.github._manan.featureflags.exception.ResourceNotFoundException;
 import com.github._manan.featureflags.repository.EnvironmentRepository;
 import com.github._manan.featureflags.repository.FlagRepository;
@@ -21,6 +22,7 @@ public class FlagValueService {
     private final FlagValueRepository flagValueRepository;
     private final FlagRepository flagRepository;
     private final EnvironmentRepository environmentRepository;
+    private final CacheInvalidationPublisher cacheInvalidationPublisher;
 
     public List<FlagValueDto> getAll(UUID flagId, UUID environmentId, String search) {
         return flagValueRepository.findAllWithFilters(flagId, environmentId, search).stream()
@@ -64,6 +66,8 @@ public class FlagValueService {
                 .build();
 
         FlagValue saved = flagValueRepository.save(flagValue);
+        cacheInvalidationPublisher.publishFlagValueCreated(
+                environment.getKey(), environment.getId(), flag.getKey());
         return FlagValueDto.from(saved);
     }
 
@@ -87,6 +91,10 @@ public class FlagValueService {
         flagValue.getVariants().addAll(variants);
 
         FlagValue saved = flagValueRepository.save(flagValue);
+        cacheInvalidationPublisher.publishFlagValueUpdated(
+                flagValue.getEnvironment().getKey(),
+                flagValue.getEnvironment().getId(),
+                flagValue.getFlag().getKey());
         return FlagValueDto.from(saved);
     }
 
@@ -97,6 +105,10 @@ public class FlagValueService {
 
         flagValue.setIsActive(false);
         flagValueRepository.save(flagValue);
+        cacheInvalidationPublisher.publishFlagValueDeleted(
+                flagValue.getEnvironment().getKey(),
+                flagValue.getEnvironment().getId(),
+                flagValue.getFlag().getKey());
     }
 
     private void validateVariantValues(FlagType type, List<FlagValueVariantDto> variants) {

@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
+	Redis    RedisConfig
 }
 
 type ServerConfig struct {
@@ -32,6 +33,15 @@ type DatabaseConfig struct {
 	MaxConnIdleTime time.Duration
 }
 
+type RedisConfig struct {
+	Host     string
+	Port     int
+	Password string
+	DB       int
+	TTL      time.Duration
+	PoolSize int
+}
+
 func Load() (*Config, error) {
 	cfg := &Config{
 		Server: ServerConfig{
@@ -51,6 +61,14 @@ func Load() (*Config, error) {
 			MinConns:        getEnvInt("DB_MIN_CONNS", 5),
 			MaxConnLifetime: getEnvDuration("DB_MAX_CONN_LIFETIME", 1*time.Hour),
 			MaxConnIdleTime: getEnvDuration("DB_MAX_CONN_IDLE_TIME", 30*time.Minute),
+		},
+		Redis: RedisConfig{
+			Host:     getEnvString("REDIS_HOST", "localhost"),
+			Port:     getEnvInt("REDIS_PORT", 6379),
+			Password: getEnvString("REDIS_PASSWORD", ""),
+			DB:       getEnvInt("REDIS_DB", 0),
+			TTL:      getEnvDuration("REDIS_TTL", 5*time.Minute),
+			PoolSize: getEnvInt("REDIS_POOL_SIZE", 10),
 		},
 	}
 
