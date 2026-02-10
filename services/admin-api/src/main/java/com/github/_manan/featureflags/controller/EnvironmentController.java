@@ -48,4 +48,9 @@ public class EnvironmentController {
         environmentService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/api-key")
+    public ResponseEntity<EnvironmentDto> regenerateApiKey(@PathVariable UUID id) {
+        return ResponseEntity.ok(environmentService.regenerateApiKey(id));
+    }
 }

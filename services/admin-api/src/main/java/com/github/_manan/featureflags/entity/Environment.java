@@ -7,7 +7,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "environments", indexes = {
-        @Index(name = "idx_environment_key_active", columnList = "key, is_active")
+        @Index(name = "idx_environment_key_active", columnList = "key, is_active"),
+        @Index(name = "idx_environment_api_key", columnList = "api_key", unique = true)
 })
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -31,6 +32,9 @@ public class Environment extends AuditableEntity {
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
+
+    @Column(name = "api_key", nullable = false, unique = true)
+    private String apiKey;
 
     @PrePersist
     protected void onCreate() {

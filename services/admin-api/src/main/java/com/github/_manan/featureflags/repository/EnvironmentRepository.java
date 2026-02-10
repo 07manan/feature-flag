@@ -19,4 +19,6 @@ public interface EnvironmentRepository extends JpaRepository<Environment, UUID> 
 
     List<Environment> findByIsActiveTrueAndNameContainingIgnoreCaseOrIsActiveTrueAndDescriptionContainingIgnoreCase(
             String name, String description);
+
+    boolean existsByApiKey(String apiKey);
 }

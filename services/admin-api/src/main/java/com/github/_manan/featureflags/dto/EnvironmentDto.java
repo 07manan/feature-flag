@@ -34,6 +34,8 @@ public class EnvironmentDto {
 
     private Boolean isActive;
 
+    private String apiKey;
+
     private Instant createdAt;
 
     private Instant updatedAt;
@@ -45,6 +47,7 @@ public class EnvironmentDto {
                 .name(environment.getName())
                 .description(environment.getDescription())
                 .isActive(environment.getIsActive())
+                .apiKey(environment.getApiKey())
                 .createdAt(environment.getCreatedAt())
                 .updatedAt(environment.getUpdatedAt())
                 .build();

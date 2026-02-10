@@ -5,6 +5,7 @@ import com.github._manan.featureflags.entity.Environment;
 import com.github._manan.featureflags.exception.ResourceNotFoundException;
 import com.github._manan.featureflags.repository.EnvironmentRepository;
 import com.github._manan.featureflags.repository.FlagValueRepository;
+import com.github._manan.featureflags.util.ApiKeyGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +52,7 @@ public class EnvironmentService {
                 .key(request.getKey())
                 .name(request.getName())
                 .description(request.getDescription())
+                .apiKey(generateUniqueApiKey(request.getKey()))
                 .build();
 
         environment = environmentRepository.save(environment);
@@ -82,5 +84,23 @@ public class EnvironmentService {
         
         environment.setIsActive(false);
         environmentRepository.save(environment);
+    }
+
+    @Transactional
+    public EnvironmentDto regenerateApiKey(UUID id) {
+        Environment environment = environmentRepository.findByIdAndIsActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Environment", "id", id));
+
+        environment.setApiKey(generateUniqueApiKey(environment.getKey()));
+        environment = environmentRepository.save(environment);
+        return EnvironmentDto.from(environment);
+    }
+
+    private String generateUniqueApiKey(String environmentKey) {
+        String apiKey;
+        do {
+            apiKey = ApiKeyGenerator.generateApiKey(environmentKey);
+        } while (environmentRepository.existsByApiKey(apiKey));
+        return apiKey;
     }
 }

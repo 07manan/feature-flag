@@ -14,6 +14,7 @@ The Environments API allows you to manage deployment environments for the featur
   - [Create Environment](#create-environment)
   - [Update Environment](#update-environment)
   - [Delete Environment](#delete-environment)
+  - [Regenerate API Key](#regenerate-api-key)
 - [Error Responses](#error-responses)
 - [Business Rules](#business-rules)
 
@@ -56,6 +57,7 @@ All Environment API endpoints require the **ADMIN** role. Users without this rol
 | `name` | `string` | Human-readable display name |
 | `description` | `string` | Optional description of the environment |
 | `isActive` | `boolean` | Whether the environment is active (read-only) |
+| `apiKey` | `string` | API key for SDK authentication (read-only, auto-generated) |
 | `createdAt` | `ISO 8601` | Timestamp of creation (read-only) |
 | `updatedAt` | `ISO 8601` | Timestamp of last update (read-only) |
 
@@ -103,6 +105,7 @@ Content-Type: application/json
     "name": "Production",
     "description": "Live production environment",
     "isActive": true,
+    "apiKey": "ff_production_xK9mP2nQ4wE7rT1yU6iO3pA8sD5fG0hJ",
     "createdAt": "2026-01-15T10:30:00Z",
     "updatedAt": "2026-01-15T10:30:00Z"
   },
@@ -112,6 +115,7 @@ Content-Type: application/json
     "name": "Staging",
     "description": "Pre-production testing environment",
     "isActive": true,
+    "apiKey": "ff_staging_aB3cD4eF5gH6iJ7kL8mN9oP0qR1sT2uV",
     "createdAt": "2026-01-15T10:31:00Z",
     "updatedAt": "2026-01-15T10:31:00Z"
   }
@@ -158,6 +162,7 @@ Content-Type: application/json
   "name": "Production",
   "description": "Live production environment",
   "isActive": true,
+  "apiKey": "ff_production_xK9mP2nQ4wE7rT1yU6iO3pA8sD5fG0hJ",
   "createdAt": "2026-01-15T10:30:00Z",
   "updatedAt": "2026-01-15T10:30:00Z"
 }
@@ -212,6 +217,7 @@ Content-Type: application/json
   "name": "Development",
   "description": "Local development environment",
   "isActive": true,
+  "apiKey": "ff_development_zY9xW8vU7tS6rQ5pO4nM3lK2jI1hG0fE",
   "createdAt": "2026-01-28T14:00:00Z",
   "updatedAt": "2026-01-28T14:00:00Z"
 }
@@ -284,6 +290,7 @@ Content-Type: application/json
   "name": "Production (US-East)",
   "description": "Primary production environment in US-East region",
   "isActive": true,
+  "apiKey": "ff_production_xK9mP2nQ4wE7rT1yU6iO3pA8sD5fG0hJ",
   "createdAt": "2026-01-15T10:30:00Z",
   "updatedAt": "2026-01-28T15:00:00Z"
 }
@@ -324,6 +331,50 @@ HTTP/1.1 204 No Content
 | Status | Condition |
 |--------|-----------|
 | `404 Not Found` | Environment not found or has already been deleted |
+
+---
+
+### Regenerate API Key
+
+Regenerate the API key for an environment. The old API key will be invalidated immediately.
+
+**Request**
+
+```
+POST /environments/{id}/api-key
+```
+
+**Path Parameters**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | `UUID` | Yes | The environment's unique identifier |
+
+**Response**
+
+```
+HTTP/1.1 200 OK
+Content-Type: application/json
+```
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "key": "production",
+  "name": "Production",
+  "description": "Live production environment",
+  "isActive": true,
+  "apiKey": "ff_production_nEwKeY1234567890abcdefghijklmnop",
+  "createdAt": "2026-01-15T10:30:00Z",
+  "updatedAt": "2026-01-28T16:00:00Z"
+}
+```
+
+**Error Responses**
+
+| Status | Condition |
+|--------|-----------|
+| `404 Not Found` | Environment not found or has been deleted |
 
 ---
 
@@ -450,5 +501,11 @@ curl -X PATCH "http://localhost:8080/environments/550e8400-e29b-41d4-a716-446655
 **Delete environment:**
 ```bash
 curl -X DELETE "http://localhost:8080/environments/550e8400-e29b-41d4-a716-446655440000" \
+  -H "Authorization: Bearer <token>"
+```
+
+**Regenerate API key:**
+```bash
+curl -X POST "http://localhost:8080/environments/550e8400-e29b-41d4-a716-446655440000/api-key" \
   -H "Authorization: Bearer <token>"
 ```
