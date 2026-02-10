@@ -4,6 +4,7 @@ export interface Environment {
     name: string;
     description?: string;
     isActive: boolean;
+    apiKey: string;
     createdAt: string;
     updatedAt: string;
 }

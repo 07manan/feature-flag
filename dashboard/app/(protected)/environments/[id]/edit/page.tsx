@@ -9,7 +9,7 @@ import { ApiError } from "@/lib/api/client";
 import { getEnvironment } from "@/lib/api/environments";
 import type { Environment } from "@/lib/types";
 
-import { EnvironmentForm } from "@/components/environments";
+import { EnvironmentForm, ApiKeyDisplay, RegenerateApiKeyDialog } from "@/components/environments";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -97,6 +97,26 @@ export default function EditEnvironmentPage() {
                 </CardHeader>
                 <CardContent>
                     <EnvironmentForm mode="edit" initialData={environment} />
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>API Key</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-muted-foreground mb-2">
+                                Use this API key to authenticate SDK requests for this environment.
+                            </p>
+                            <ApiKeyDisplay apiKey={environment.apiKey} />
+                        </div>
+                        <RegenerateApiKeyDialog
+                            environment={environment}
+                            onRegenerated={(updated) => setEnvironment(updated)}
+                        />
+                    </div>
                 </CardContent>
             </Card>
         </div>

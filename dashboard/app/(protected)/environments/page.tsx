@@ -10,7 +10,7 @@ import { ApiError } from "@/lib/api/client";
 import { getEnvironments } from "@/lib/api/environments";
 import type { Environment } from "@/lib/types";
 
-import { DeleteEnvironmentDialog } from "@/components/environments";
+import { DeleteEnvironmentDialog, ApiKeyDisplay } from "@/components/environments";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -105,6 +105,7 @@ export default function EnvironmentsPage() {
                                     <TableRow>
                                         <TableHead className="pl-4">Name</TableHead>
                                         <TableHead>Key</TableHead>
+                                        <TableHead>API Key</TableHead>
                                         <TableHead className="text-right pr-4">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -116,6 +117,9 @@ export default function EnvironmentsPage() {
                                                 <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
                                                     {environment.key}
                                                 </code>
+                                            </TableCell>
+                                            <TableCell>
+                                                <ApiKeyDisplay apiKey={environment.apiKey} />
                                             </TableCell>
                                             <TableCell className="text-right pr-4">
                                                 <div className="flex items-center justify-end gap-2">

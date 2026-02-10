@@ -29,3 +29,9 @@ export async function deleteEnvironment(id: string): Promise<void> {
         method: "DELETE",
     });
 }
+
+export async function regenerateApiKey(id: string): Promise<Environment> {
+    return fetchApi<Environment>(`/environments/${id}/api-key`, {
+        method: "POST",
+    });
+}
