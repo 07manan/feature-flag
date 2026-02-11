@@ -35,12 +35,16 @@ type DatabaseConfig struct {
 }
 
 type RedisConfig struct {
-	Host     string
-	Port     int
-	Password string
-	DB       int
-	TTL      time.Duration
-	PoolSize int
+	URL          string // Full Redis URL (redis://user:password@host:port/db)
+	Host         string // Fallback: individual host
+	Port         int    // Fallback: individual port
+	Password     string // Fallback: individual password
+	DB           int    // Fallback: individual DB
+	TTL          time.Duration
+	PoolSize     int
+	DialTimeout  time.Duration
+	ReadTimeout  time.Duration
+	WriteTimeout time.Duration
 }
 
 type MemoryCacheConfig struct {
@@ -70,12 +74,16 @@ func Load() (*Config, error) {
 			MaxConnIdleTime: getEnvDuration("DB_MAX_CONN_IDLE_TIME", 30*time.Minute),
 		},
 		Redis: RedisConfig{
-			Host:     getEnvString("REDIS_HOST", "localhost"),
-			Port:     getEnvInt("REDIS_PORT", 6379),
-			Password: getEnvString("REDIS_PASSWORD", ""),
-			DB:       getEnvInt("REDIS_DB", 0),
-			TTL:      getEnvDuration("REDIS_TTL", 5*time.Minute),
-			PoolSize: getEnvInt("REDIS_POOL_SIZE", 10),
+			URL:          getEnvString("REDIS_URL", ""),
+			Host:         getEnvString("REDIS_HOST", "localhost"),
+			Port:         getEnvInt("REDIS_PORT", 6379),
+			Password:     getEnvString("REDIS_PASSWORD", ""),
+			DB:           getEnvInt("REDIS_DB", 0),
+			TTL:          getEnvDuration("REDIS_TTL", 5*time.Minute),
+			PoolSize:     getEnvInt("REDIS_POOL_SIZE", 10),
+			DialTimeout:  getEnvDuration("REDIS_DIAL_TIMEOUT", 10*time.Second),
+			ReadTimeout:  getEnvDuration("REDIS_READ_TIMEOUT", 10*time.Second),
+			WriteTimeout: getEnvDuration("REDIS_WRITE_TIMEOUT", 10*time.Second),
 		},
 		MemoryCache: MemoryCacheConfig{
 			MaxSize:     getEnvInt64("MEMORY_CACHE_MAX_SIZE", 100*1024*1024), // 100MB

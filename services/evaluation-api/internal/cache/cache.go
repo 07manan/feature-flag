@@ -35,14 +35,33 @@ type RedisCache struct {
 
 // NewRedisCache creates a new Redis cache client
 func NewRedisCache(cfg config.RedisConfig, logger *slog.Logger) (*RedisCache, error) {
-	client := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
-		Password: cfg.Password,
-		DB:       cfg.DB,
-		PoolSize: cfg.PoolSize,
-	})
+	var client *redis.Client
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// Prefer URL if provided, otherwise use individual fields
+	if cfg.URL != "" {
+		opt, err := redis.ParseURL(cfg.URL)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse redis URL: %w", err)
+		}
+		// Apply custom timeouts and pool size
+		opt.PoolSize = cfg.PoolSize
+		opt.DialTimeout = cfg.DialTimeout
+		opt.ReadTimeout = cfg.ReadTimeout
+		opt.WriteTimeout = cfg.WriteTimeout
+		client = redis.NewClient(opt)
+	} else {
+		client = redis.NewClient(&redis.Options{
+			Addr:         fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
+			Password:     cfg.Password,
+			DB:           cfg.DB,
+			PoolSize:     cfg.PoolSize,
+			DialTimeout:  cfg.DialTimeout,
+			ReadTimeout:  cfg.ReadTimeout,
+			WriteTimeout: cfg.WriteTimeout,
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	if err := client.Ping(ctx).Err(); err != nil {
