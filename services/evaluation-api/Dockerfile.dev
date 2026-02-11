@@ -1,0 +1,25 @@
+# Development Dockerfile for Go Evaluation API with Air hot-reload
+FROM golang:1.25-alpine
+
+WORKDIR /app
+
+# Install Air for hot-reload
+RUN go install github.com/air-verse/air@latest
+
+# Install build dependencies
+RUN apk add --no-cache git ca-certificates
+
+# Copy go mod files
+COPY go.mod go.sum ./
+
+# Download dependencies (cached layer)
+RUN go mod download
+
+# Copy source code (will be overridden by volume mount in dev)
+COPY . .
+
+# Expose server port
+EXPOSE 8081
+
+# Start Air for hot-reload
+CMD ["air", "-c", ".air.toml"]
