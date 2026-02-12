@@ -165,7 +165,7 @@ Content-Type: application/json
 
 | Status | Condition |
 |--------|-----------|
-| `400 Bad Request` | User not found |
+| `404 Not Found` | User not found |
 
 ---
 
@@ -230,7 +230,7 @@ Content-Type: application/json
 
 | Status | Condition |
 |--------|-----------|
-| `400 Bad Request` | User not found |
+| `404 Not Found` | User not found |
 | `400 Bad Request` | Invalid role value |
 
 ---
@@ -261,7 +261,7 @@ HTTP/1.1 204 No Content
 
 | Status | Condition |
 |--------|-----------|
-| `400 Bad Request` | User not found |
+| `404 Not Found` | User not found |
 
 > ⚠️ **Warning:** This is a permanent deletion. Consider disabling the user (`enabled: false`) instead if you want to preserve the account.
 
@@ -286,9 +286,10 @@ All error responses follow this format:
 
 | Status Code | Description |
 |-------------|-------------|
-| `400 Bad Request` | Validation error or user not found |
+| `400 Bad Request` | Validation error |
 | `401 Unauthorized` | Missing or invalid JWT token |
 | `403 Forbidden` | User lacks required ADMIN role |
+| `404 Not Found` | User not found |
 | `405 Method Not Allowed` | HTTP method not supported for endpoint |
 | `500 Internal Server Error` | Unexpected server error |
 
