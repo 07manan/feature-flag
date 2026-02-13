@@ -1,0 +1,667 @@
+{
+  "metadata": {
+    "mode": "constant",
+    "duration": "30s",
+    "concurrency": 50,
+    "targetRps": 1000,
+    "evalUrl": "http://localhost:8081",
+    "adminUrl": "http://localhost:8080",
+    "timestamp": "2026-02-13T13:39:18.369249+05:30",
+    "goVersion": "go1.25.7",
+    "discoveredEnvironments": [
+      "dev",
+      "development",
+      "staging",
+      "production",
+      "qa"
+    ],
+    "discoveredFlags": [
+      "dark-mode",
+      "dark-mode-enabled",
+      "new-checkout-flow",
+      "welcome-message",
+      "beta-features",
+      "cache-ttl-seconds",
+      "max-upload-size-mb",
+      "api-rate-limit",
+      "support-email"
+    ],
+    "userPoolSize": 1000,
+    "endpoint": "both"
+  },
+  "global": {
+    "throughput": {
+      "totalRequests": 29805,
+      "successful": 29804,
+      "failed": 1,
+      "actualRps": 993.4887500976731,
+      "peakRps": 1002,
+      "bytesTransferred": 14516750,
+      "throughputMBps": 0.4614698289078774
+    },
+    "latency": {
+      "minMs": 0.065,
+      "maxMs": 47.583,
+      "meanMs": 0.7276541519879215,
+      "stdDevMs": 0.8471364326051793,
+      "p50Ms": 0.334,
+      "p75Ms": 1.22,
+      "p90Ms": 1.78,
+      "p95Ms": 2.129,
+      "p99Ms": 3.033,
+      "p999Ms": 7.775,
+      "p9999Ms": 16.039
+    },
+    "ttfb": {
+      "minMs": 0.072,
+      "maxMs": 47.551,
+      "meanMs": 0.7066185746879613,
+      "stdDevMs": 0.8437419015643415,
+      "p50Ms": 0.313,
+      "p75Ms": 1.197,
+      "p90Ms": 1.753,
+      "p95Ms": 2.101,
+      "p99Ms": 2.993,
+      "p999Ms": 7.755,
+      "p9999Ms": 15.999
+    },
+    "connection": {
+      "avgDnsMs": 2.5184545454545453,
+      "avgTcpMs": 0.5839090909090909,
+      "avgTlsMs": 0
+    },
+    "errors": {
+      "ratePercent": 0.0033551417547391374,
+      "byStatusCode": {
+        "200": 29804
+      },
+      "byType": {
+        "timeout": 1
+      }
+    },
+    "availabilityPercent": 99.99664485824526
+  },
+  "perEnvironment": {
+    "dev": {
+      "environmentKey": "dev",
+      "throughput": {
+        "totalRequests": 5915,
+        "successful": 5915,
+        "failed": 0,
+        "actualRps": 197.16443404890913,
+        "peakRps": 0,
+        "bytesTransferred": 2559703,
+        "throughputMBps": 0.08136984555530545
+      },
+      "latency": {
+        "minMs": 0.098,
+        "maxMs": 17.103,
+        "meanMs": 1.47710989010989,
+        "stdDevMs": 0.9507364504619187,
+        "p50Ms": 1.489,
+        "p75Ms": 1.842,
+        "p90Ms": 2.309,
+        "p95Ms": 2.663,
+        "p99Ms": 3.999,
+        "p999Ms": 11.599,
+        "p9999Ms": 15.751
+      },
+      "ttfb": {
+        "minMs": 0.091,
+        "maxMs": 17.103,
+        "meanMs": 1.4541293322062552,
+        "stdDevMs": 0.9467673772477595,
+        "p50Ms": 1.469,
+        "p75Ms": 1.813,
+        "p90Ms": 2.283,
+        "p95Ms": 2.623,
+        "p99Ms": 3.937,
+        "p999Ms": 11.583,
+        "p9999Ms": 15.743
+      },
+      "errors": {
+        "ratePercent": 0,
+        "byStatusCode": {
+          "200": 5915
+        },
+        "byType": {}
+      }
+    },
+    "development": {
+      "environmentKey": "development",
+      "throughput": {
+        "totalRequests": 5915,
+        "successful": 5915,
+        "failed": 0,
+        "actualRps": 197.16443404890913,
+        "peakRps": 0,
+        "bytesTransferred": 2987031,
+        "throughputMBps": 0.09495408300842309
+      },
+      "latency": {
+        "minMs": 0.094,
+        "maxMs": 15.047,
+        "meanMs": 0.47592138630600167,
+        "stdDevMs": 0.5748382936195483,
+        "p50Ms": 0.302,
+        "p75Ms": 0.399,
+        "p90Ms": 1.11,
+        "p95Ms": 1.633,
+        "p99Ms": 2.637,
+        "p999Ms": 4.887,
+        "p9999Ms": 10.679
+      },
+      "ttfb": {
+        "minMs": 0.088,
+        "maxMs": 15.031,
+        "meanMs": 0.4548118343195266,
+        "stdDevMs": 0.571160727611869,
+        "p50Ms": 0.282,
+        "p75Ms": 0.373,
+        "p90Ms": 1.07,
+        "p95Ms": 1.601,
+        "p99Ms": 2.599,
+        "p999Ms": 4.859,
+        "p9999Ms": 10.671
+      },
+      "errors": {
+        "ratePercent": 0,
+        "byStatusCode": {
+          "200": 5915
+        },
+        "byType": {}
+      }
+    },
+    "production": {
+      "environmentKey": "production",
+      "throughput": {
+        "totalRequests": 5967,
+        "successful": 5967,
+        "failed": 0,
+        "actualRps": 198.8977477548336,
+        "peakRps": 0,
+        "bytesTransferred": 2993053,
+        "throughputMBps": 0.09514551506516329
+      },
+      "latency": {
+        "minMs": 0.088,
+        "maxMs": 12.191,
+        "meanMs": 0.46257315233785823,
+        "stdDevMs": 0.5249951665397148,
+        "p50Ms": 0.299,
+        "p75Ms": 0.394,
+        "p90Ms": 0.946,
+        "p95Ms": 1.597,
+        "p99Ms": 2.383,
+        "p999Ms": 4.559,
+        "p9999Ms": 10.359
+      },
+      "ttfb": {
+        "minMs": 0.081,
+        "maxMs": 12.183,
+        "meanMs": 0.44253092006033184,
+        "stdDevMs": 0.5226282146228176,
+        "p50Ms": 0.281,
+        "p75Ms": 0.369,
+        "p90Ms": 0.918,
+        "p95Ms": 1.573,
+        "p99Ms": 2.359,
+        "p999Ms": 4.543,
+        "p9999Ms": 10.351
+      },
+      "errors": {
+        "ratePercent": 0,
+        "byStatusCode": {
+          "200": 5967
+        },
+        "byType": {}
+      }
+    },
+    "qa": {
+      "environmentKey": "qa",
+      "throughput": {
+        "totalRequests": 5925,
+        "successful": 5925,
+        "failed": 0,
+        "actualRps": 197.49776360774075,
+        "peakRps": 0,
+        "bytesTransferred": 2882836,
+        "throughputMBps": 0.09164185066832932
+      },
+      "latency": {
+        "minMs": 0.097,
+        "maxMs": 47.583,
+        "meanMs": 0.7529964556962025,
+        "stdDevMs": 1.0099108327540707,
+        "p50Ms": 0.338,
+        "p75Ms": 1.295,
+        "p90Ms": 1.796,
+        "p95Ms": 2.133,
+        "p99Ms": 2.867,
+        "p999Ms": 7.483,
+        "p9999Ms": 16.063
+      },
+      "ttfb": {
+        "minMs": 0.091,
+        "maxMs": 47.551,
+        "meanMs": 0.7319569620253165,
+        "stdDevMs": 1.006058392750901,
+        "p50Ms": 0.317,
+        "p75Ms": 1.277,
+        "p90Ms": 1.77,
+        "p95Ms": 2.103,
+        "p99Ms": 2.839,
+        "p999Ms": 7.471,
+        "p9999Ms": 16.031
+      },
+      "errors": {
+        "ratePercent": 0,
+        "byStatusCode": {
+          "200": 5925
+        },
+        "byType": {}
+      }
+    },
+    "staging": {
+      "environmentKey": "staging",
+      "throughput": {
+        "totalRequests": 6083,
+        "successful": 6082,
+        "failed": 1,
+        "actualRps": 202.7643706372805,
+        "peakRps": 0,
+        "bytesTransferred": 3094127,
+        "throughputMBps": 0.09835853461065625
+      },
+      "latency": {
+        "minMs": 0.065,
+        "maxMs": 13.263,
+        "meanMs": 0.47901923393062634,
+        "stdDevMs": 0.5594919848131293,
+        "p50Ms": 0.302,
+        "p75Ms": 0.403,
+        "p90Ms": 1.207,
+        "p95Ms": 1.632,
+        "p99Ms": 2.507,
+        "p999Ms": 4.443,
+        "p9999Ms": 12.943
+      },
+      "ttfb": {
+        "minMs": 0.072,
+        "maxMs": 13.239,
+        "meanMs": 0.45893554751726406,
+        "stdDevMs": 0.5568248119613758,
+        "p50Ms": 0.283,
+        "p75Ms": 0.378,
+        "p90Ms": 1.179,
+        "p95Ms": 1.612,
+        "p99Ms": 2.485,
+        "p999Ms": 4.411,
+        "p9999Ms": 12.927
+      },
+      "errors": {
+        "ratePercent": 0.01643925694558606,
+        "byStatusCode": {
+          "200": 6082
+        },
+        "byType": {
+          "timeout": 1
+        }
+      }
+    }
+  },
+  "timeSeries": [
+    {
+      "second": 0,
+      "timestamp": "2026-02-13T13:38:43.361645+05:30",
+      "rps": 1,
+      "p50_latency_ms": 0.412,
+      "p99_latency_ms": 0.412,
+      "mean_latency_ms": 0.412,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 401
+    },
+    {
+      "second": 5,
+      "timestamp": "2026-02-13T13:38:48.361645+05:30",
+      "rps": 990,
+      "p50_latency_ms": 0.326,
+      "p99_latency_ms": 2.668,
+      "mean_latency_ms": 0.6701323232323231,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 473133
+    },
+    {
+      "second": 6,
+      "timestamp": "2026-02-13T13:38:49.361645+05:30",
+      "rps": 996,
+      "p50_latency_ms": 0.333,
+      "p99_latency_ms": 3.134,
+      "mean_latency_ms": 0.7389136546184746,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 490784
+    },
+    {
+      "second": 7,
+      "timestamp": "2026-02-13T13:38:50.361645+05:30",
+      "rps": 996,
+      "p50_latency_ms": 0.329,
+      "p99_latency_ms": 2.758,
+      "mean_latency_ms": 0.7097761044176707,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 469234
+    },
+    {
+      "second": 8,
+      "timestamp": "2026-02-13T13:38:51.361645+05:30",
+      "rps": 987,
+      "p50_latency_ms": 0.32,
+      "p99_latency_ms": 3.159,
+      "mean_latency_ms": 0.7162847011144885,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 467389
+    },
+    {
+      "second": 9,
+      "timestamp": "2026-02-13T13:38:52.361645+05:30",
+      "rps": 991,
+      "p50_latency_ms": 0.355,
+      "p99_latency_ms": 3.073,
+      "mean_latency_ms": 0.7406155398587285,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 490981
+    },
+    {
+      "second": 10,
+      "timestamp": "2026-02-13T13:38:53.361645+05:30",
+      "rps": 1000,
+      "p50_latency_ms": 0.328,
+      "p99_latency_ms": 2.526,
+      "mean_latency_ms": 0.6826889999999998,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 482476
+    },
+    {
+      "second": 11,
+      "timestamp": "2026-02-13T13:38:54.361645+05:30",
+      "rps": 1000,
+      "p50_latency_ms": 0.327,
+      "p99_latency_ms": 2.723,
+      "mean_latency_ms": 0.6714010000000002,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 506186
+    },
+    {
+      "second": 12,
+      "timestamp": "2026-02-13T13:38:55.361645+05:30",
+      "rps": 998,
+      "p50_latency_ms": 0.335,
+      "p99_latency_ms": 2.9,
+      "mean_latency_ms": 0.7221673346693388,
+      "errors": 0,
+      "in_flight": 1,
+      "bytes_recv": 489781
+    },
+    {
+      "second": 13,
+      "timestamp": "2026-02-13T13:38:56.361645+05:30",
+      "rps": 1001,
+      "p50_latency_ms": 0.343,
+      "p99_latency_ms": 3.073,
+      "mean_latency_ms": 0.7432547452547448,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 490592
+    },
+    {
+      "second": 14,
+      "timestamp": "2026-02-13T13:38:57.361645+05:30",
+      "rps": 996,
+      "p50_latency_ms": 0.349,
+      "p99_latency_ms": 8.392,
+      "mean_latency_ms": 0.8696967871485946,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 485296
+    },
+    {
+      "second": 15,
+      "timestamp": "2026-02-13T13:38:58.361645+05:30",
+      "rps": 997,
+      "p50_latency_ms": 0.35,
+      "p99_latency_ms": 3.142,
+      "mean_latency_ms": 0.7537071213640926,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 491828
+    },
+    {
+      "second": 16,
+      "timestamp": "2026-02-13T13:38:59.361645+05:30",
+      "rps": 998,
+      "p50_latency_ms": 0.347,
+      "p99_latency_ms": 2.889,
+      "mean_latency_ms": 0.7144719438877756,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 494829
+    },
+    {
+      "second": 17,
+      "timestamp": "2026-02-13T13:39:00.361645+05:30",
+      "rps": 998,
+      "p50_latency_ms": 0.333,
+      "p99_latency_ms": 2.698,
+      "mean_latency_ms": 0.719971943887776,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 486351
+    },
+    {
+      "second": 18,
+      "timestamp": "2026-02-13T13:39:01.361645+05:30",
+      "rps": 991,
+      "p50_latency_ms": 0.338,
+      "p99_latency_ms": 2.835,
+      "mean_latency_ms": 0.7394137235116045,
+      "errors": 0,
+      "in_flight": 1,
+      "bytes_recv": 481412
+    },
+    {
+      "second": 19,
+      "timestamp": "2026-02-13T13:39:02.361645+05:30",
+      "rps": 998,
+      "p50_latency_ms": 0.334,
+      "p99_latency_ms": 2.832,
+      "mean_latency_ms": 0.7309348697394789,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 480752
+    },
+    {
+      "second": 20,
+      "timestamp": "2026-02-13T13:39:03.361645+05:30",
+      "rps": 1000,
+      "p50_latency_ms": 0.325,
+      "p99_latency_ms": 2.618,
+      "mean_latency_ms": 0.6885369999999998,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 503830
+    },
+    {
+      "second": 21,
+      "timestamp": "2026-02-13T13:39:04.361645+05:30",
+      "rps": 999,
+      "p50_latency_ms": 0.342,
+      "p99_latency_ms": 2.503,
+      "mean_latency_ms": 0.7189989989989992,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 465205
+    },
+    {
+      "second": 22,
+      "timestamp": "2026-02-13T13:39:05.361645+05:30",
+      "rps": 989,
+      "p50_latency_ms": 0.343,
+      "p99_latency_ms": 3.112,
+      "mean_latency_ms": 0.7418291203235595,
+      "errors": 0,
+      "in_flight": 1,
+      "bytes_recv": 485725
+    },
+    {
+      "second": 23,
+      "timestamp": "2026-02-13T13:39:06.361645+05:30",
+      "rps": 996,
+      "p50_latency_ms": 0.346,
+      "p99_latency_ms": 2.957,
+      "mean_latency_ms": 0.7142510040160653,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 483721
+    },
+    {
+      "second": 24,
+      "timestamp": "2026-02-13T13:39:07.361645+05:30",
+      "rps": 997,
+      "p50_latency_ms": 0.327,
+      "p99_latency_ms": 2.538,
+      "mean_latency_ms": 0.6731484453360091,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 489741
+    },
+    {
+      "second": 25,
+      "timestamp": "2026-02-13T13:39:08.361645+05:30",
+      "rps": 995,
+      "p50_latency_ms": 0.307,
+      "p99_latency_ms": 3.242,
+      "mean_latency_ms": 0.6937135678391958,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 495058
+    },
+    {
+      "second": 26,
+      "timestamp": "2026-02-13T13:39:09.361645+05:30",
+      "rps": 994,
+      "p50_latency_ms": 0.329,
+      "p99_latency_ms": 3.322,
+      "mean_latency_ms": 0.6907002012072436,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 481881
+    },
+    {
+      "second": 27,
+      "timestamp": "2026-02-13T13:39:10.361645+05:30",
+      "rps": 933,
+      "p50_latency_ms": 0.33,
+      "p99_latency_ms": 3.596,
+      "mean_latency_ms": 0.8122293676312968,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 450068
+    },
+    {
+      "second": 28,
+      "timestamp": "2026-02-13T13:39:11.361645+05:30",
+      "rps": 990,
+      "p50_latency_ms": 0.332,
+      "p99_latency_ms": 3.218,
+      "mean_latency_ms": 0.7589797979797984,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 471201
+    },
+    {
+      "second": 29,
+      "timestamp": "2026-02-13T13:39:12.361645+05:30",
+      "rps": 983,
+      "p50_latency_ms": 0.325,
+      "p99_latency_ms": 3.117,
+      "mean_latency_ms": 0.7304964394710072,
+      "errors": 0,
+      "in_flight": 1,
+      "bytes_recv": 470473
+    },
+    {
+      "second": 30,
+      "timestamp": "2026-02-13T13:39:13.361645+05:30",
+      "rps": 999,
+      "p50_latency_ms": 0.334,
+      "p99_latency_ms": 3.421,
+      "mean_latency_ms": 0.7733493493493491,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 497240
+    },
+    {
+      "second": 31,
+      "timestamp": "2026-02-13T13:39:14.361645+05:30",
+      "rps": 992,
+      "p50_latency_ms": 0.34,
+      "p99_latency_ms": 3.223,
+      "mean_latency_ms": 0.7504062500000002,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 477862
+    },
+    {
+      "second": 32,
+      "timestamp": "2026-02-13T13:39:15.361645+05:30",
+      "rps": 1002,
+      "p50_latency_ms": 0.323,
+      "p99_latency_ms": 2.796,
+      "mean_latency_ms": 0.7069830339321361,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 485268
+    },
+    {
+      "second": 33,
+      "timestamp": "2026-02-13T13:39:16.361645+05:30",
+      "rps": 1000,
+      "p50_latency_ms": 0.339,
+      "p99_latency_ms": 2.762,
+      "mean_latency_ms": 0.7272010000000004,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 472682
+    },
+    {
+      "second": 34,
+      "timestamp": "2026-02-13T13:39:17.361645+05:30",
+      "rps": 997,
+      "p50_latency_ms": 0.35,
+      "p99_latency_ms": 3.25,
+      "mean_latency_ms": 0.7313931795386157,
+      "errors": 0,
+      "in_flight": 0,
+      "bytes_recv": 505370
+    },
+    {
+      "second": 35,
+      "timestamp": "2026-02-13T13:39:18.361645+05:30",
+      "rps": 1,
+      "p50_latency_ms": 0.065,
+      "p99_latency_ms": 0.065,
+      "mean_latency_ms": 0.065,
+      "errors": 1,
+      "in_flight": 0,
+      "bytes_recv": 0
+    }
+  ]
+}
