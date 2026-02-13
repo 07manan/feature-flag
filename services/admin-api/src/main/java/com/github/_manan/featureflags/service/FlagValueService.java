@@ -76,7 +76,6 @@ public class FlagValueService {
         FlagValue flagValue = flagValueRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FlagValue", "id", id));
 
-        // Validate flagId matches the existing flag value
         if (!flagValue.getFlag().getId().equals(request.getFlagId())) {
             throw new IllegalArgumentException("Flag ID cannot be changed");
         }

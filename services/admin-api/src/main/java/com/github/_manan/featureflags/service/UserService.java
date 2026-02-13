@@ -3,6 +3,7 @@ package com.github._manan.featureflags.service;
 import com.github._manan.featureflags.dto.UpdateUserRequest;
 import com.github._manan.featureflags.dto.UserDto;
 import com.github._manan.featureflags.entity.User;
+import com.github._manan.featureflags.exception.IllegalSelfOperationException;
 import com.github._manan.featureflags.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,11 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto updateUser(UUID id, UpdateUserRequest request) {
+    public UserDto updateUser(UUID id, UpdateUserRequest request, UUID currentUserId) {
+        if (request.getEnabled() != null && !request.getEnabled() && id.equals(currentUserId)) {
+            throw new IllegalSelfOperationException("Cannot disable your own account");
+        }
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
 
@@ -52,7 +57,10 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(UUID id) {
+    public void deleteUser(UUID id, UUID currentUserId) {
+        if (id.equals(currentUserId)) {
+            throw new IllegalSelfOperationException("Cannot delete your own account");
+        }
         if (!userRepository.existsById(id)) {
             throw new IllegalArgumentException("User not found with id: " + id);
         }

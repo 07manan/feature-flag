@@ -55,6 +55,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(IllegalSelfOperationException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalSelfOperationException(IllegalSelfOperationException ex) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Map<String, Object>> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
         String message = String.format("Invalid value '%s' for parameter '%s'", ex.getValue(), ex.getName());

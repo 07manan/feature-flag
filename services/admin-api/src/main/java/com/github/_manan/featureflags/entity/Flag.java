@@ -5,11 +5,6 @@ import lombok.*;
 
 import java.util.UUID;
 
-/**
- * Entity representing a feature flag definition.
- * A flag defines the metadata and default value for a feature toggle.
- * Environment-specific overrides are managed separately.
- */
 @Entity
 @Table(
     name = "flags",

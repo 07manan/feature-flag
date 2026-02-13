@@ -232,6 +232,7 @@ Content-Type: application/json
 |--------|-----------|
 | `404 Not Found` | User not found |
 | `400 Bad Request` | Invalid role value |
+| `409 Conflict` | Cannot disable your own account |
 
 ---
 
@@ -262,6 +263,7 @@ HTTP/1.1 204 No Content
 | Status | Condition |
 |--------|-----------|
 | `404 Not Found` | User not found |
+| `409 Conflict` | Cannot delete your own account |
 
 > ⚠️ **Warning:** This is a permanent deletion. Consider disabling the user (`enabled: false`) instead if you want to preserve the account.
 
@@ -291,6 +293,7 @@ All error responses follow this format:
 | `403 Forbidden` | User lacks required ADMIN role |
 | `404 Not Found` | User not found |
 | `405 Method Not Allowed` | HTTP method not supported for endpoint |
+| `409 Conflict` | Self-operation not allowed (e.g., deleting or disabling own account) |
 | `500 Internal Server Error` | Unexpected server error |
 
 ---
@@ -319,6 +322,15 @@ The `email` field cannot be changed after registration:
   - Remain in the system with their data intact
   - Can be re-enabled by an admin
 - **Deleting** a user permanently removes them from the system
+
+### Self-Operation Prevention
+
+Users **cannot** perform the following actions on their own account:
+
+- **Delete** their own account (`DELETE /users/{own-id}` → `409 Conflict`)
+- **Disable** their own account (`PATCH /users/{own-id}` with `enabled: false` → `409 Conflict`)
+
+This prevents accidental admin lockout and ensures at least one active administrator can always manage the system. Other self-updates (e.g., changing name or role) are still permitted.
 
 ### Hard Delete
 
