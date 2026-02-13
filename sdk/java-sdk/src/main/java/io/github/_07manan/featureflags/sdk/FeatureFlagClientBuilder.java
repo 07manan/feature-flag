@@ -1,4 +1,4 @@
-package com.github._manan.featureflags.sdk;
+package io.github._07manan.featureflags.sdk;
 
 import java.util.concurrent.TimeUnit;
 

@@ -1,10 +1,10 @@
-package com.github._manan.featureflags.sdk;
+package io.github._07manan.featureflags.sdk;
 
-import com.github._manan.featureflags.sdk.exception.AuthenticationException;
-import com.github._manan.featureflags.sdk.exception.FlagNotFoundException;
-import com.github._manan.featureflags.sdk.http.HttpClient;
-import com.github._manan.featureflags.sdk.model.EvaluationResult;
-import com.github._manan.featureflags.sdk.model.FlagType;
+import io.github._07manan.featureflags.sdk.exception.AuthenticationException;
+import io.github._07manan.featureflags.sdk.exception.FlagNotFoundException;
+import io.github._07manan.featureflags.sdk.http.HttpClient;
+import io.github._07manan.featureflags.sdk.model.EvaluationResult;
+import io.github._07manan.featureflags.sdk.model.FlagType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

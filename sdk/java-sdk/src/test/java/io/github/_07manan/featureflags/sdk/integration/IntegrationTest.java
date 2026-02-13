@@ -1,8 +1,8 @@
-package com.github._manan.featureflags.sdk.integration;
+package io.github._07manan.featureflags.sdk.integration;
 
-import com.github._manan.featureflags.sdk.FeatureFlagClient;
-import com.github._manan.featureflags.sdk.exception.AuthenticationException;
-import com.github._manan.featureflags.sdk.exception.FlagNotFoundException;
+import io.github._07manan.featureflags.sdk.FeatureFlagClient;
+import io.github._07manan.featureflags.sdk.exception.AuthenticationException;
+import io.github._07manan.featureflags.sdk.exception.FlagNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;

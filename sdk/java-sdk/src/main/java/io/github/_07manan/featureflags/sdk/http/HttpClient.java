@@ -1,11 +1,11 @@
-package com.github._manan.featureflags.sdk.http;
+package io.github._07manan.featureflags.sdk.http;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github._manan.featureflags.sdk.exception.AuthenticationException;
-import com.github._manan.featureflags.sdk.exception.FeatureFlagException;
-import com.github._manan.featureflags.sdk.exception.FlagNotFoundException;
-import com.github._manan.featureflags.sdk.model.EvaluationResult;
+import io.github._07manan.featureflags.sdk.exception.AuthenticationException;
+import io.github._07manan.featureflags.sdk.exception.FeatureFlagException;
+import io.github._07manan.featureflags.sdk.exception.FlagNotFoundException;
+import io.github._07manan.featureflags.sdk.model.EvaluationResult;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;

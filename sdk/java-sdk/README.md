@@ -22,7 +22,7 @@ Add the following dependency to your `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>com.github._manan.featureflags</groupId>
+    <groupId>io.github._07manan.featureflags</groupId>
     <artifactId>featureflags-java-sdk</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 </dependency>
@@ -31,7 +31,7 @@ Add the following dependency to your `pom.xml`:
 ## Quick Start
 
 ```java
-import com.github._manan.featureflags.sdk.FeatureFlagClient;
+import io.github._07manan.featureflags.sdk.FeatureFlagClient;
 
 // Initialize the client with your API key
 FeatureFlagClient client = FeatureFlagClient.builder()
@@ -348,7 +348,7 @@ The SDK uses SLF4J for logging. Configure your logging framework (Logback, Log4j
 Example Logback configuration:
 
 ```xml
-<logger name="com.github._manan.featureflags.sdk" level="INFO"/>
+<logger name="io.github._07manan.featureflags.sdk" level="INFO"/>
 ```
 
 ## Building from Source

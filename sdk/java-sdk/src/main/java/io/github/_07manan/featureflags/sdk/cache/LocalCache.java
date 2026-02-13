@@ -1,4 +1,4 @@
-package com.github._manan.featureflags.sdk.cache;
+package io.github._07manan.featureflags.sdk.cache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

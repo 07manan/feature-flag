@@ -1,4 +1,4 @@
-package com.github._manan.featureflags.sdk.model;
+package io.github._07manan.featureflags.sdk.model;
 
 /**
  * Enum representing the type of a feature flag value.

@@ -1,4 +1,4 @@
-package com.github._manan.featureflags.sdk.cache;
+package io.github._07manan.featureflags.sdk.cache;
 
 class CacheEntry<T> {
     private final T value;

@@ -1,4 +1,4 @@
-package com.github._manan.featureflags.sdk.model;
+package io.github._07manan.featureflags.sdk.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

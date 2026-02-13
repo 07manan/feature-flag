@@ -1,4 +1,4 @@
-package com.github._manan.featureflags.sdk.cache;
+package io.github._07manan.featureflags.sdk.cache;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
