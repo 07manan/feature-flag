@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import * as authApi from "@/lib/api/auth";
+import { getUser as fetchCurrentUser } from "@/lib/api/users";
 import {
     setToken,
     clearToken,
@@ -32,11 +33,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const { user: storedUser } = initializeToken();
-        if (storedUser) {
-            setUser(storedUser);
+        async function validateUser() {
+            const { token, user: storedUser } = initializeToken();
+            if (token && storedUser) {
+                setUser(storedUser);
+                try {
+                    const freshUser = await fetchCurrentUser(storedUser.id);
+                    setUser(freshUser);
+                    setToken(token, freshUser);
+                } catch {
+                    clearToken();
+                    setUser(null);
+                }
+            }
+            setIsLoading(false);
         }
-        setIsLoading(false);
+
+        validateUser();
     }, []);
 
     const login = useCallback(async (credentials: LoginCredentials) => {
