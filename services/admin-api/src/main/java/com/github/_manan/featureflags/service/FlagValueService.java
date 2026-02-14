@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,9 +55,9 @@ public class FlagValueService {
 
         validateVariantValues(flag.getType(), request.getVariants());
 
-        List<FlagValueVariant> variants = request.getVariants().stream()
+        List<FlagValueVariant> variants = new ArrayList<>(request.getVariants().stream()
                 .map(FlagValueVariantDto::toEntity)
-                .toList();
+                .toList());
 
         FlagValue flagValue = FlagValue.builder()
                 .flag(flag)

@@ -4,6 +4,7 @@ import com.github._manan.featureflags.dto.UpdateUserRequest;
 import com.github._manan.featureflags.dto.UserDto;
 import com.github._manan.featureflags.entity.User;
 import com.github._manan.featureflags.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,7 +35,7 @@ public class UserController {
     @PatchMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(
             @PathVariable UUID id,
-            @RequestBody UpdateUserRequest request,
+            @Valid @RequestBody UpdateUserRequest request,
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(userService.updateUser(id, request, currentUser.getId()));
     }
