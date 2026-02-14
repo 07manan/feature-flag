@@ -32,8 +32,8 @@ public class UserService {
 
     @Transactional
     public UserDto updateUser(UUID id, UpdateUserRequest request, UUID currentUserId) {
-        if (request.getEnabled() != null && !request.getEnabled() && id.equals(currentUserId)) {
-            throw new IllegalSelfOperationException("Cannot disable your own account");
+        if (request.getEnabled() != null && id.equals(currentUserId)) {
+            throw new IllegalSelfOperationException("Cannot change enabled status of your own account");
         }
 
         User user = userRepository.findById(id)

@@ -219,7 +219,7 @@ class UserIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("Cannot disable your own account"));
+                .andExpect(jsonPath("$.message").value("Cannot change enabled status of your own account"));
     }
 
     @Test
@@ -372,8 +372,8 @@ class UserIntegrationTest {
     }
 
     @Test
-    void updateUser_enableSelf_succeeds() throws Exception {
-        // Enabling self should succeed (only disabling self is blocked)
+    void updateUser_enableSelf_returnsConflict() throws Exception {
+        // Both enabling and disabling self are blocked
         UpdateUserRequest request = UpdateUserRequest.builder()
                 .enabled(true)
                 .build();
@@ -382,8 +382,8 @@ class UserIntegrationTest {
                         .header("Authorization", TestHelper.bearerToken(adminToken))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.enabled").value(true));
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Cannot change enabled status of your own account"));
     }
 
     @Test

@@ -232,7 +232,7 @@ Content-Type: application/json
 |--------|-----------|
 | `404 Not Found` | User not found |
 | `400 Bad Request` | Invalid role value |
-| `409 Conflict` | Cannot disable your own account |
+| `409 Conflict` | Cannot change enabled status of your own account |
 
 ---
 
@@ -328,7 +328,7 @@ The `email` field cannot be changed after registration:
 Users **cannot** perform the following actions on their own account:
 
 - **Delete** their own account (`DELETE /users/{own-id}` → `409 Conflict`)
-- **Disable** their own account (`PATCH /users/{own-id}` with `enabled: false` → `409 Conflict`)
+- **Change their own enabled status** (`PATCH /users/{own-id}` with `enabled: true` or `false` → `409 Conflict`)
 
 This prevents accidental admin lockout and ensures at least one active administrator can always manage the system. Other self-updates (e.g., changing name or role) are still permitted.
 
