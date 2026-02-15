@@ -10,7 +10,6 @@ A production-grade, full-stack feature flag management system — built from scr
 | Admin API | [feature-flag-0bfu.onrender.com](https://feature-flag-0bfu.onrender.com) |
 | Evaluation API | [strong-lorena-07manan-b3c1d402.koyeb.app](https://strong-lorena-07manan-b3c1d402.koyeb.app/) |
 
-> **Note:** The Admin API is hosted on Render's free tier and spins down after inactivity. The first request may take up to **~5 minutes** to cold-start. Subsequent requests are fast.
 
 ---
 
@@ -51,35 +50,131 @@ A production-grade, full-stack feature flag management system — built from scr
 
 ## Performance
 
-Benchmarked with a custom Go stress-testing tool against locally running services (PostgreSQL + Redis + Evaluation API).
+Stress-tested with a [custom Go benchmarking tool](benchmarking/README.md) across 4 scenarios — constant load, ramp-up, spike traffic, and 30-minute soak — hitting **2.57 million total requests** with **99.999% availability** across all runs.
+
+> **Note:** All benchmarks were run on a single machine — the stress tester and Evaluation API running on bare metal, with PostgreSQL and Redis in Docker containers.
+
+### Constant Load — 1,000 RPS for 10 minutes
+
+Sustained high-throughput evaluation under steady-state conditions.
 
 | Metric | Value |
 |--------|-------|
-| **Throughput** | **~1,000 RPS** sustained over 30s |
-| **Total Requests** | 29,805 |
-| **Success Rate** | **99.997%** (1 timeout out of 29,805) |
+| **Throughput** | **998 RPS** sustained (target: 1,000) |
+| **Total Requests** | 598,707 |
+| **Availability** | **99.999%** (3 timeouts) |
 | **p50 Latency** | **0.33 ms** |
-| **p95 Latency** | **2.13 ms** |
-| **p99 Latency** | **3.03 ms** |
-| **Mean Latency** | 0.73 ms |
-| **Max Latency** | 47.58 ms |
-| **Mean TTFB** | 0.71 ms |
-| **Data Transferred** | 14.5 MB @ 0.46 MB/s |
+| **p95 Latency** | **2.24 ms** |
+| **p99 Latency** | **3.17 ms** |
+| **Mean TTFB** | 0.59 ms |
+| **Data Transferred** | 285 MB @ 0.47 MB/s |
 
 <details>
-<summary><strong>Per-environment breakdown (5 environments tested concurrently)</strong></summary>
+<summary><strong>Per-environment breakdown (4 environments tested concurrently)</strong></summary>
 
 | Environment | Requests | RPS | p50 (ms) | p99 (ms) | Errors |
 |-------------|----------|-----|----------|----------|--------|
-| dev | 5,915 | 197 | 1.24 | 2.76 | 0 |
-| development | 5,993 | 200 | 0.32 | 2.68 | 0 |
-| staging | 6,053 | 202 | 0.32 | 3.17 | 1 |
-| production | 5,849 | 195 | 0.32 | 2.33 | 0 |
-| qa | 5,995 | 200 | 0.30 | 3.40 | 0 |
+| development | 150,168 | 250 | 0.32 | 2.94 | 1 |
+| production | 149,297 | 249 | 0.32 | 2.93 | 1 |
+| staging | 149,700 | 250 | 0.32 | 2.96 | 1 |
+| qa | 149,542 | 249 | 0.38 | 3.52 | 0 |
 
 </details>
 
-> Benchmark config: constant mode, 50 concurrent workers, 1000 target RPS, 30s duration, 1000-user pool, across 5 environments and 9 flags.
+### Ramp-Up — 100 → 5,000 RPS over 5 minutes
+
+Linearly increasing load to find the breaking point. Peak observed: **4,919 RPS**.
+
+| Metric | Value |
+|--------|-------|
+| **Peak RPS** | **4,919** |
+| **Average RPS** | 2,500 |
+| **Total Requests** | 749,985 |
+| **Availability** | **99.999%** (6 timeouts) |
+| **p50 Latency** | **0.36 ms** |
+| **p95 Latency** | **1.64 ms** |
+| **p99 Latency** | **3.04 ms** |
+| **Mean TTFB** | 0.60 ms |
+| **Data Transferred** | 357 MB @ 1.19 MB/s |
+
+<details>
+<summary><strong>Per-environment breakdown</strong></summary>
+
+| Environment | Requests | RPS | p50 (ms) | p99 (ms) | Errors |
+|-------------|----------|-----|----------|----------|--------|
+| development | 187,449 | 625 | 0.34 | 2.83 | 1 |
+| production | 187,379 | 625 | 0.34 | 2.83 | 2 |
+| staging | 187,421 | 625 | 0.34 | 2.83 | 2 |
+| qa | 187,736 | 626 | 0.41 | 3.51 | 1 |
+
+</details>
+
+### Spike — 500 RPS baseline, 5,000 RPS burst for 10 minutes
+
+Simulates sudden traffic bursts (10× spike) to test system resilience.
+
+| Metric | Value |
+|--------|-------|
+| **Baseline RPS** | 500 |
+| **Peak RPS** | **5,001** |
+| **Total Requests** | 322,495 |
+| **Availability** | **99.999%** (2 timeouts) |
+| **p50 Latency** | **0.42 ms** |
+| **p95 Latency** | **2.71 ms** |
+| **p99 Latency** | **3.73 ms** |
+| **Mean TTFB** | 0.70 ms |
+| **Data Transferred** | 153 MB @ 0.26 MB/s |
+
+<details>
+<summary><strong>Per-environment breakdown</strong></summary>
+
+| Environment | Requests | RPS | p50 (ms) | p99 (ms) | Errors |
+|-------------|----------|-----|----------|----------|--------|
+| development | 80,517 | 134 | 0.41 | 3.55 | 0 |
+| production | 80,447 | 134 | 0.41 | 3.59 | 0 |
+| staging | 80,409 | 134 | 0.41 | 3.58 | 0 |
+| qa | 81,122 | 135 | 0.45 | 4.08 | 2 |
+
+</details>
+
+### Soak — 500 RPS for 30 minutes
+
+Extended endurance test to detect memory leaks, connection exhaustion, and latency degradation over time.
+
+| Metric | Value |
+|--------|-------|
+| **Throughput** | **499 RPS** sustained for 30 minutes |
+| **Total Requests** | 897,450 |
+| **Availability** | **99.999%** (1 timeout) |
+| **p50 Latency** | **0.44 ms** |
+| **p95 Latency** | **2.90 ms** |
+| **p99 Latency** | **3.90 ms** |
+| **Mean TTFB** | 0.75 ms |
+| **Data Transferred** | 427 MB @ 0.24 MB/s |
+
+<details>
+<summary><strong>Per-environment breakdown</strong></summary>
+
+| Environment | Requests | RPS | p50 (ms) | p99 (ms) | Errors |
+|-------------|----------|-----|----------|----------|--------|
+| development | 224,238 | 125 | 0.43 | 3.70 | 0 |
+| production | 224,386 | 125 | 0.43 | 3.69 | 1 |
+| staging | 224,435 | 125 | 0.43 | 3.68 | 0 |
+| qa | 224,391 | 125 | 0.48 | 4.32 | 0 |
+
+</details>
+
+### Summary
+
+| Scenario | Duration | Total Requests | Availability | p50 (ms) | p99 (ms) | Peak RPS |
+|----------|----------|----------------|--------------|----------|----------|----------|
+| Constant | 10 min | 598,707 | 99.999% | 0.33 | 3.17 | 1,002 |
+| Ramp-Up | 5 min | 749,985 | 99.999% | 0.36 | 3.04 | 4,919 |
+| Spike | 10 min | 322,495 | 99.999% | 0.42 | 3.73 | 5,001 |
+| Soak | 30 min | 897,450 | 99.999% | 0.44 | 3.90 | 501 |
+| **Total** | **55 min** | **2,568,637** | **99.999%** | — | — | **5,001** |
+
+> Benchmark config: 50 concurrent workers, 1,000-user pool, 4 environments × 9 flags, both single and bulk endpoints. Full raw results in [`benchmarking/results/`](benchmarking/results/).
 
 ---
 

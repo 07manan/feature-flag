@@ -10,15 +10,18 @@ import (
 	"github.com/manan/feature-flag/benchmarking/metrics"
 )
 
-// Export writes the test result as a pretty-printed JSON file.
-// If the output file already exists, it is rotated to an archive/ subdirectory.
-func Export(result *metrics.TestResult, outputPath string) error {
-	dir := filepath.Dir(outputPath)
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+// Export writes the test result as a pretty-printed JSON file named after the
+// test mode (e.g. results/constant.json, results/rampup.json). If a result for
+// the same mode already exists, it is rotated to an archive/ subdirectory.
+// outputDir is the directory to write into, and mode is the test mode string.
+func Export(result *metrics.TestResult, outputDir, mode string) error {
+	if err := os.MkdirAll(outputDir, 0o755); err != nil {
 		return fmt.Errorf("create output dir: %w", err)
 	}
 
-	// Rotate existing file
+	outputPath := filepath.Join(outputDir, mode+".json")
+
+	// Rotate existing file for this mode
 	if err := rotateExisting(outputPath); err != nil {
 		return fmt.Errorf("rotate existing: %w", err)
 	}

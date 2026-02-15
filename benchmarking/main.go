@@ -149,8 +149,9 @@ func main() {
 
 	// ── Export ───────────────────────────────────────────────────
 	if cfg.OutputPath != "" {
-		fmt.Printf("\n⏳ Exporting results to %s... ", cfg.OutputPath)
-		if err := exporter.Export(result, cfg.OutputPath); err != nil {
+		outFile := fmt.Sprintf("%s/%s.json", cfg.OutputPath, cfg.Mode)
+		fmt.Printf("\n⏳ Exporting results to %s... ", outFile)
+		if err := exporter.Export(result, cfg.OutputPath, string(cfg.Mode)); err != nil {
 			fmt.Printf("✗\n  Error: %v\n", err)
 		} else {
 			fmt.Println("✓")

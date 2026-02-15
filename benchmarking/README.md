@@ -15,7 +15,7 @@ A CLI stress-testing tool for the Feature Flag Evaluation API. It auto-discovers
 │  :8081       │  X-API-Key  └───────────┘
 └──────────────┘                  │
                                   ▼
-                          results/latest.json
+                          results/<mode>.json
 ```
 
 **Packages:**
@@ -143,7 +143,7 @@ Extended-duration constant load designed for detecting memory leaks, connection 
 | `-timeout` | `10s` | Per-request HTTP timeout |
 | `-warmup` | `5s` | Warm-up period (requests sent but results excluded) |
 | `-max-idle-conns` | `200` | HTTP transport max idle connections |
-| `-output` | `results/latest.json` | Path for the JSON results file |
+| `-output` | `results` | Directory for JSON results (files named by mode) |
 | `-error-threshold` | `5.0` | Error rate (%) above which the tool exits with code 1 |
 
 ## Metrics Collected
@@ -187,14 +187,18 @@ A live progress line updates during the test showing elapsed time, current RPS, 
 
 ### JSON Export
 
-Results are written to `results/latest.json` (configurable with `-output`). When a previous result exists, it is rotated to `results/archive/latest_YYYYMMDD_HHMMSS.json` so you always keep history.
+Results are written to a per-mode file in the output directory (e.g., `results/constant.json`, `results/rampup.json`). Each mode keeps its own latest result. When the same mode is tested again, the previous result is rotated to `results/archive/<mode>_YYYYMMDD_HHMMSS.json`.
 
 ```
 results/
-├── latest.json          ← current run (committed)
-└── archive/             ← previous runs (gitignored)
-    ├── latest_20260213_143022.json
-    └── latest_20260212_091500.json
+├── constant.json        ← latest constant mode run
+├── rampup.json          ← latest rampup mode run
+├── spike.json           ← latest spike mode run
+├── soak.json            ← latest soak mode run
+└── archive/             ← previous runs per mode (gitignored)
+    ├── constant_20260213_143022.json
+    ├── rampup_20260212_091500.json
+    └── spike_20260211_180000.json
 ```
 
 ### JSON Structure

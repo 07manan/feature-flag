@@ -119,7 +119,7 @@ func Parse() (*Config, error) {
 	flag.IntVar(&cfg.MaxIdleConns, "max-idle-conns", 200, "HTTP transport max idle connections")
 
 	// Output
-	flag.StringVar(&cfg.OutputPath, "output", "results/latest.json", "Path for JSON results")
+	flag.StringVar(&cfg.OutputPath, "output", "results", "Directory for JSON results (files named by mode)")
 	flag.Float64Var(&cfg.ErrorThreshold, "error-threshold", 5.0, "Error rate threshold (%) for exit code 1")
 
 	flag.Usage = func() {
