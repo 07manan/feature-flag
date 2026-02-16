@@ -2,8 +2,6 @@
 
 A production-grade, full-stack feature flag management system — built from scratch with a polyglot architecture spanning Java, Go, TypeScript, and React. Designed for real-world scale: deterministic percentage rollouts, sub-millisecond evaluations, two-tier caching, and multi-environment support.
 
-> **Live & Deployed** — not just a local demo.
-
 | Component | URL |
 |-----------|-----|
 | Dashboard | [feature-flag-platform.vercel.app](https://feature-flag-platform.vercel.app/dashboard) |
@@ -16,34 +14,36 @@ A production-grade, full-stack feature flag management system — built from scr
 ## Architecture
 
 ```
-    ┌──────────────┐   ┌──────────────┐           ┌───────────────────────────────────┐
-    │   Java SDK   │   │  Node SDK    │           │        Dashboard (Next.js)        │
-    └──────┬───────┘   └───────┬──────┘           │        React 19 · TypeScript      │
-           │                   │                  └─────────────────┬─────────────────┘
-           │  GET /evaluate    │                                    │
-           └─────────┬─────────┘                                    │ REST
-                     │                                              │
-                     ▼                                              ▼
-    ┌───────────────────────────────┐             ┌────────────────────────────────┐
-    │    Evaluation API (Go)        │             │      Admin API (Java)          │
-    │    Read-only · Chi router     │             │      Spring Boot · JWT         │
-    │    L1 Ristretto + L2 Redis    │             │      OAuth2 · Spring Security  │
-    └──────────┬──────────┬─────────┘             └──────────┬──────────┬──────────┘
-               │          │                                  │          │
-               │          │ subscribe              publish   │          │
-               │          └─────────────┐    ┌───────────────┘          │
-               │                        │    │                          │
-               │                        ▼    ▼                          │
-               │           ┌──────────────────────────────┐             │
-               │           │          Redis 7             │             │
-               │           │   L2 cache + Pub/Sub         │             │
-               │           └──────────────────────────────┘             │
-               │                                                        │
-               │ query                                       read/write │
-               │          ┌──────────────────────────────┐              │
-               │          │       PostgreSQL 16          │              │
-               └─────────▶│     (source of truth)        │◀─────────────┘
-                          └──────────────────────────────┘
+                    ┌───────────────────────────────────┐
+                    │        Dashboard (Next.js)        │
+                    │      React 19 · TypeScript        │
+                    └─────────────────┬─────────────────┘
+                                      │ REST
+                                      ▼
+                    ┌────────────────────────────────┐
+                    │      Admin API (Java)          │
+                    │    Spring Boot · JWT · OAuth2  │
+                    └───────┬────────────────┬───────┘
+                            │                │
+                  read/write│                │ publish invalidation
+                            │                │
+               ┌────────────▼──┐    ┌────────▼─────────────┐
+               │ PostgreSQL 16 │    │       Redis 7        │
+               │ source of     │    │  L2 cache + Pub/Sub  │
+               │ truth         │    │                      │
+               └────────────▲──┘    └────────▲─────────────┘
+                            │                │
+                      query │                │ subscribe + L2 cache
+                            │                │
+                    ┌───────┴────────────────┴───────┐
+                    │    Evaluation API (Go)         │
+                    │  Read-only · Chi · Ristretto   │
+                    └─────────────────▲──────────────┘
+                                      │ GET /evaluate
+                                      │
+                    ┌─────────────────┴──────────────┐
+                    │   Java SDK    ·    Node SDK    │
+                    └───────────────────────────────-┘
 ```
 
 ---
@@ -68,6 +68,8 @@ Sustained high-throughput evaluation under steady-state conditions.
 | **p99 Latency** | **3.17 ms** |
 | **Mean TTFB** | 0.59 ms |
 | **Data Transferred** | 285 MB @ 0.47 MB/s |
+
+![Per-environment latency comparison under constant 1,000 RPS load](benchmarking/results/graphs/constant_per_env.svg)
 
 <details>
 <summary><strong>Per-environment breakdown (4 environments tested concurrently)</strong></summary>
@@ -97,6 +99,8 @@ Linearly increasing load to find the breaking point. Peak observed: **4,919 RPS*
 | **Mean TTFB** | 0.60 ms |
 | **Data Transferred** | 357 MB @ 1.19 MB/s |
 
+![Latency remains flat as RPS scales from 100 to 5,000](benchmarking/results/graphs/rampup_latency_vs_rps.svg)
+
 <details>
 <summary><strong>Per-environment breakdown</strong></summary>
 
@@ -125,6 +129,8 @@ Simulates sudden traffic bursts (10× spike) to test system resilience.
 | **Mean TTFB** | 0.70 ms |
 | **Data Transferred** | 153 MB @ 0.26 MB/s |
 
+![RPS spikes 10× while latency absorbs the burst and recovers](benchmarking/results/graphs/spike_resilience.svg)
+
 <details>
 <summary><strong>Per-environment breakdown</strong></summary>
 
@@ -152,6 +158,8 @@ Extended endurance test to detect memory leaks, connection exhaustion, and laten
 | **Mean TTFB** | 0.75 ms |
 | **Data Transferred** | 427 MB @ 0.24 MB/s |
 
+![Flat latency over 30 minutes — no degradation or memory leaks](benchmarking/results/graphs/soak_latency_stability.svg)
+
 <details>
 <summary><strong>Per-environment breakdown</strong></summary>
 
@@ -173,6 +181,8 @@ Extended endurance test to detect memory leaks, connection exhaustion, and laten
 | Spike | 10 min | 322,495 | 99.999% | 0.42 | 3.73 | 5,001 |
 | Soak | 30 min | 897,450 | 99.999% | 0.44 | 3.90 | 501 |
 | **Total** | **55 min** | **2,568,637** | **99.999%** | — | — | **5,001** |
+
+![All four benchmark modes — RPS over time](benchmarking/results/graphs/all_modes_overview.svg)
 
 > Benchmark config: 50 concurrent workers, 1,000-user pool, 4 environments × 9 flags, both single and bulk endpoints. Full raw results in [`benchmarking/results/`](benchmarking/results/).
 

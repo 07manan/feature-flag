@@ -28,14 +28,11 @@ The Evaluation API provides fast, read-only access to feature flag evaluations. 
 - **Deterministic Rollouts**: Percentage-based rollouts use MurmurHash3 for consistent user bucketing
 - **Environment-Scoped**: Each API key is tied to a specific environment (production, staging, etc.)
 - **Type-Safe Values**: Flags support BOOLEAN, STRING, and NUMBER types
-- **Real-Time Invalidation**: Cache invalidation via Redis Pub/Sub ensures fresh data
 
 ### Architecture
 
 ```
 SDK Client → Evaluation API → [L1 Memory Cache] → [L2 Redis Cache] → PostgreSQL
-                                  ↓
-                            Redis Pub/Sub (invalidation)
 ```
 
 ---

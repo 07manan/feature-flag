@@ -142,28 +142,26 @@ dashboard/
 ### Authentication Flow
 
 ```mermaid
-sequenceDiagram
-    participant User
-    participant Dashboard
-    participant Admin API
-    participant Google
+flowchart TD
+    A([User visits /login]) --> B{Choose method}
 
-    User->>Dashboard: Navigate to /login
-    
-    alt Email/Password
-        User->>Dashboard: Enter credentials
-        Dashboard->>Admin API: POST /auth/login
-        Admin API-->>Dashboard: JWT token
-    else Google OAuth
-        User->>Dashboard: Click "Sign in with Google"
-        Dashboard->>Google: Redirect to OAuth
-        Google-->>Dashboard: ID token
-        Dashboard->>Admin API: POST /auth/oauth2/google
-        Admin API-->>Dashboard: JWT token
-    end
-    
-    Dashboard->>Dashboard: Store token in localStorage
-    Dashboard->>User: Redirect to /dashboard
+    B -->|Email & Password| C[Enter credentials]
+    C --> D[POST /auth/login]
+
+    B -->|Google OAuth| E[Click Sign in with Google]
+    E --> F[Google OAuth consent]
+    F --> G[Receive ID token]
+    G --> H[POST /auth/oauth2/google]
+
+    D --> I[Receive JWT]
+    H --> I
+
+    I --> J[Store token in localStorage]
+    J --> K([Redirect to /dashboard])
+
+    style A fill:#2d333b,stroke:#58a6ff,color:#c9d1d9
+    style K fill:#2d333b,stroke:#3fb950,color:#c9d1d9
+    style B fill:#2d333b,stroke:#f78166,color:#c9d1d9
 ```
 
 ### Token Management

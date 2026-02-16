@@ -237,6 +237,20 @@ results/
 }
 ```
 
+## Generating Graphs
+
+To regenerate the SVG charts from the benchmark results:
+
+```bash
+cd data/graphs
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python generate.py
+```
+
+The script reads JSON results from `benchmarking/results/` and outputs 5 SVG files to `benchmarking/results/graphs/` for the root README.
+
 ## Exit Codes
 
 | Code | Meaning |

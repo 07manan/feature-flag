@@ -1,2 +1,3 @@
 results/archive/
 stress-tester
+__pycache__/
