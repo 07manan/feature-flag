@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Flag, LayoutDashboard, Layers, Users, Sliders } from "lucide-react";
+import { Flag, LayoutDashboard, Layers, Users, Sliders, Github, Linkedin } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -40,6 +40,19 @@ const navItems: NavItem[] = [
     },
 ];
 
+const externalLinks = [
+    {
+        label: "GitHub",
+        href: "https://github.com/07manan/feature-flag",
+        icon: Github,
+    },
+    {
+        label: "LinkedIn",
+        href: "https://www.linkedin.com/in/mananrpatel/",
+        icon: Linkedin,
+    },
+];
+
 export function Sidebar() {
     const pathname = usePathname();
 
@@ -70,6 +83,27 @@ export function Sidebar() {
                     })}
                 </ul>
             </nav>
+
+            <div className="border-t p-4">
+                <ul className="space-y-1">
+                    {externalLinks.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                            <li key={item.href}>
+                                <a
+                                    href={item.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent/50"
+                                >
+                                    <Icon className="size-4 shrink-0" />
+                                    {item.label}
+                                </a>
+                            </li>
+                        );
+                    })}
+                </ul>
+            </div>
         </aside>
     );
 }
