@@ -129,3 +129,8 @@ body {
         @apply bg-background text-foreground;
     }
 }
+
+/* Fix Google Sign-In button white background in dark mode */
+.dark iframe[src*="accounts.google.com"] {
+    color-scheme: auto;
+}

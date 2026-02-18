@@ -71,8 +71,6 @@ export default function DashboardPage() {
         fetchStats();
     }, [fetchStats]);
 
-    const booleanFlags = stats?.flags.filter((f) => f.type === "BOOLEAN") ?? [];
-    const enabledBooleanFlags = booleanFlags.filter((f) => f.defaultValue === "true");
     const recentFlags = [...(stats?.flags ?? [])]
         .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
         .slice(0, 5);
@@ -105,7 +103,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Flags</CardTitle>
@@ -114,7 +112,7 @@ export default function DashboardPage() {
                     <CardContent>
                         <div className="text-2xl font-bold">{stats?.flags.length ?? 0}</div>
                         <p className="text-xs text-muted-foreground">
-                            {booleanFlags.length} boolean · {(stats?.flags.length ?? 0) - booleanFlags.length} other
+                            Across {stats?.environments.length ?? 0} environments
                         </p>
                     </CardContent>
                 </Card>
@@ -145,22 +143,6 @@ export default function DashboardPage() {
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Boolean Flags Enabled</CardTitle>
-                        <ToggleRight className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {booleanFlags.length > 0
-                                ? `${Math.round((enabledBooleanFlags.length / booleanFlags.length) * 100)}%`
-                                : "—"}
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                            {enabledBooleanFlags.length} of {booleanFlags.length} enabled
-                        </p>
-                    </CardContent>
-                </Card>
             </div>
 
             {/* Recent Flags & Quick Links */}
