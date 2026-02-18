@@ -108,7 +108,7 @@ func (h *Handler) Ready(w http.ResponseWriter, r *http.Request) {
 		h.logger.Warn("readiness check failed", "error", err)
 		h.respondJSON(w, http.StatusServiceUnavailable, map[string]string{
 			"status": "unavailable",
-			"reason": "database connection failed",
+			"reason": err.Error(),
 		})
 		return
 	}

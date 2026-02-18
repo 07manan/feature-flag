@@ -19,7 +19,6 @@ type CacheInvalidationEvent struct {
 	EnvironmentID  string `json:"environmentId,omitempty"`
 }
 
-// Subscriber listens for cache invalidation events
 type Subscriber struct {
 	client *redis.Client
 	cache  cache.Cache
@@ -27,7 +26,6 @@ type Subscriber struct {
 	cancel context.CancelFunc
 }
 
-// New creates a new cache invalidation subscriber
 func New(client *redis.Client, c cache.Cache, logger *slog.Logger) *Subscriber {
 	return &Subscriber{
 		client: client,
@@ -36,7 +34,6 @@ func New(client *redis.Client, c cache.Cache, logger *slog.Logger) *Subscriber {
 	}
 }
 
-// Start begins listening for cache invalidation events
 func (s *Subscriber) Start(ctx context.Context) {
 	ctx, cancel := context.WithCancel(ctx)
 	s.cancel = cancel
@@ -68,7 +65,6 @@ func (s *Subscriber) Start(ctx context.Context) {
 	}()
 }
 
-// Stop gracefully stops the subscriber
 func (s *Subscriber) Stop() {
 	if s.cancel != nil {
 		s.cancel()
@@ -130,13 +126,12 @@ func (s *Subscriber) handleFlagValueEvent(ctx context.Context, channel string, e
 		}
 	}
 
-	// Delete variants by pattern (we don't know the exact flag value ID)
+	// Delete variants by pattern since we don't know the exact flag value ID
 	if err := s.cache.DeletePattern(ctx, cache.KeyPrefixVariants+"*"); err != nil {
 		s.logger.Error("failed to invalidate variants cache", "error", err)
 		return
 	}
 
-	// Delete flag value cache by pattern
 	if err := s.cache.DeletePattern(ctx, cache.KeyPrefixFlagValue+"*"); err != nil {
 		s.logger.Error("failed to invalidate flag value cache", "error", err)
 		return
@@ -158,7 +153,7 @@ func (s *Subscriber) handleEnvironmentEvent(ctx context.Context, channel string,
 		}
 	}
 
-	// Delete all API key caches (we don't know which one changed)
+	// Delete all API key caches since we don't know which key changed
 	if err := s.cache.DeletePattern(ctx, cache.KeyPrefixEnvAPIKey+"*"); err != nil {
 		s.logger.Error("failed to invalidate API key cache", "error", err)
 		return

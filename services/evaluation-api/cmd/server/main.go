@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/lmittmann/tint"
 
 	"github.com/manan/feature-flag/evaluation-api/internal/cache"
 	"github.com/manan/feature-flag/evaluation-api/internal/config"
@@ -20,7 +21,7 @@ import (
 )
 
 func main() {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+	logger := slog.New(tint.NewHandler(os.Stdout, &tint.Options{
 		Level: slog.LevelInfo,
 	}))
 	slog.SetDefault(logger)
@@ -56,25 +57,21 @@ func main() {
 	}
 	logger.Info("connected to database")
 
-	// Initialize L1 (memory) cache
 	memoryCache, err := cache.NewMemoryCache(cfg.MemoryCache, logger)
 	if err != nil {
 		logger.Error("failed to initialize memory cache", "error", err)
 		os.Exit(1)
 	}
 
-	// Initialize L2 (Redis) cache
 	redisCache, err := cache.NewRedisCache(cfg.Redis, logger)
 	if err != nil {
 		logger.Error("failed to connect to redis", "error", err)
 		os.Exit(1)
 	}
 
-	// Create tiered cache (L1 + L2)
 	tieredCache := cache.NewTieredCache(memoryCache, redisCache, logger)
 	defer tieredCache.Close()
 
-	// Start cache invalidation subscriber
 	sub := subscriber.New(tieredCache.Client(), tieredCache, logger)
 	sub.Start(ctx)
 	defer sub.Stop()

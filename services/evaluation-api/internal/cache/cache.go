@@ -17,23 +17,21 @@ var (
 	ErrCacheMiss = errors.New("cache miss")
 )
 
-// Cache defines the interface for caching operations
 type Cache interface {
 	Get(ctx context.Context, key string, dest interface{}) error
 	Set(ctx context.Context, key string, value interface{}) error
 	Delete(ctx context.Context, keys ...string) error
 	DeletePattern(ctx context.Context, pattern string) error
+	Ping(ctx context.Context) error
 	Close() error
 }
 
-// RedisCache implements Cache using Redis
 type RedisCache struct {
 	client *redis.Client
 	ttl    time.Duration
 	logger *slog.Logger
 }
 
-// NewRedisCache creates a new Redis cache client
 func NewRedisCache(cfg config.RedisConfig, logger *slog.Logger) (*RedisCache, error) {
 	var client *redis.Client
 
@@ -43,7 +41,7 @@ func NewRedisCache(cfg config.RedisConfig, logger *slog.Logger) (*RedisCache, er
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse redis URL: %w", err)
 		}
-		// Apply custom timeouts and pool size
+		// Apply custom timeouts and pool size since ParseURL doesn't set them
 		opt.PoolSize = cfg.PoolSize
 		opt.DialTimeout = cfg.DialTimeout
 		opt.ReadTimeout = cfg.ReadTimeout
@@ -77,7 +75,6 @@ func NewRedisCache(cfg config.RedisConfig, logger *slog.Logger) (*RedisCache, er
 	}, nil
 }
 
-// Get retrieves a value from cache
 func (c *RedisCache) Get(ctx context.Context, key string, dest interface{}) error {
 	data, err := c.client.Get(ctx, key).Bytes()
 	if err != nil {
@@ -95,7 +92,6 @@ func (c *RedisCache) Get(ctx context.Context, key string, dest interface{}) erro
 	return nil
 }
 
-// Set stores a value in cache
 func (c *RedisCache) Set(ctx context.Context, key string, value interface{}) error {
 	data, err := json.Marshal(value)
 	if err != nil {
@@ -110,7 +106,6 @@ func (c *RedisCache) Set(ctx context.Context, key string, value interface{}) err
 	return nil
 }
 
-// Delete removes keys from cache
 func (c *RedisCache) Delete(ctx context.Context, keys ...string) error {
 	if len(keys) == 0 {
 		return nil
@@ -124,7 +119,6 @@ func (c *RedisCache) Delete(ctx context.Context, keys ...string) error {
 	return nil
 }
 
-// DeletePattern removes all keys matching a pattern
 func (c *RedisCache) DeletePattern(ctx context.Context, pattern string) error {
 	iter := c.client.Scan(ctx, 0, pattern, 100).Iterator()
 	var keys []string
@@ -147,17 +141,19 @@ func (c *RedisCache) DeletePattern(ctx context.Context, pattern string) error {
 	return nil
 }
 
-// Close closes the Redis connection
+func (c *RedisCache) Ping(ctx context.Context) error {
+	return c.client.Ping(ctx).Err()
+}
+
 func (c *RedisCache) Close() error {
 	return c.client.Close()
 }
 
-// Client returns the underlying Redis client for pub/sub operations
+// Client returns the underlying Redis client, needed for pub/sub operations
 func (c *RedisCache) Client() *redis.Client {
 	return c.client
 }
 
-// Cache key helpers
 const (
 	KeyPrefixEnvAPIKey     = "env:apikey:"
 	KeyPrefixFlagByKey     = "flag:key:"
@@ -167,27 +163,22 @@ const (
 	KeyPrefixFlagValue     = "flagvalue:"
 )
 
-// EnvByAPIKeyKey returns the cache key for environment by API key
 func EnvByAPIKeyKey(apiKey string) string {
 	return KeyPrefixEnvAPIKey + apiKey
 }
 
-// FlagByKeyKey returns the cache key for flag by key
 func FlagByKeyKey(flagKey string) string {
 	return KeyPrefixFlagByKey + flagKey
 }
 
-// FlagValuesEnvKey returns the cache key for flag values by environment
 func FlagValuesEnvKey(envID string) string {
 	return KeyPrefixFlagValuesEnv + envID
 }
 
-// VariantsKey returns the cache key for variants by flag value ID
 func VariantsKey(flagValueID string) string {
 	return KeyPrefixVariants + flagValueID
 }
 
-// FlagValueKey returns the cache key for a specific flag value
 func FlagValueKey(flagID, envID string) string {
 	return KeyPrefixFlagValue + flagID + ":" + envID
 }

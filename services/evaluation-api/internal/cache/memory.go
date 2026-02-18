@@ -11,14 +11,12 @@ import (
 	"github.com/manan/feature-flag/evaluation-api/internal/config"
 )
 
-// MemoryCache implements Cache using in-memory storage with ristretto
 type MemoryCache struct {
 	cache  *ristretto.Cache
 	ttl    time.Duration
 	logger *slog.Logger
 }
 
-// NewMemoryCache creates a new in-memory cache
 func NewMemoryCache(cfg config.MemoryCacheConfig, logger *slog.Logger) (*MemoryCache, error) {
 	cache, err := ristretto.NewCache(&ristretto.Config{
 		NumCounters: cfg.NumCounters, // number of keys to track frequency of
@@ -39,7 +37,6 @@ func NewMemoryCache(cfg config.MemoryCacheConfig, logger *slog.Logger) (*MemoryC
 	}, nil
 }
 
-// Get retrieves a value from in-memory cache
 func (c *MemoryCache) Get(ctx context.Context, key string, dest interface{}) error {
 	start := time.Now()
 
@@ -66,7 +63,6 @@ func (c *MemoryCache) Get(ctx context.Context, key string, dest interface{}) err
 	return nil
 }
 
-// Set stores a value in in-memory cache
 func (c *MemoryCache) Set(ctx context.Context, key string, value interface{}) error {
 	start := time.Now()
 
@@ -85,7 +81,6 @@ func (c *MemoryCache) Set(ctx context.Context, key string, value interface{}) er
 	return nil
 }
 
-// Delete removes keys from in-memory cache
 func (c *MemoryCache) Delete(ctx context.Context, keys ...string) error {
 	for _, key := range keys {
 		c.cache.Del(key)
@@ -94,21 +89,18 @@ func (c *MemoryCache) Delete(ctx context.Context, keys ...string) error {
 	return nil
 }
 
-// DeletePattern removes all keys matching a pattern from in-memory cache
-// Note: ristretto doesn't support pattern deletion, so we clear the entire cache
+// DeletePattern clears the entire cache since ristretto doesn't support pattern-based deletion
 func (c *MemoryCache) DeletePattern(ctx context.Context, pattern string) error {
 	c.cache.Clear()
 	c.logger.Debug("L1 cache cleared due to pattern delete", "pattern", pattern)
 	return nil
 }
 
-// Close closes the in-memory cache
 func (c *MemoryCache) Close() error {
 	c.cache.Close()
 	return nil
 }
 
-// Metrics returns cache statistics for debugging
 func (c *MemoryCache) Metrics() *ristretto.Metrics {
 	return c.cache.Metrics
 }
