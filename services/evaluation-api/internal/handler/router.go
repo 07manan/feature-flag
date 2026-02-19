@@ -21,7 +21,7 @@ func NewRouter(h *Handler, logger *slog.Logger) *chi.Mux {
 	r.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Access-Control-Allow-Origin", "*")
-			w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
 			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, X-API-Key")
 			w.Header().Set("Access-Control-Max-Age", "86400")
 
@@ -35,6 +35,7 @@ func NewRouter(h *Handler, logger *slog.Logger) *chi.Mux {
 	})
 
 	r.Get("/health", h.Health)
+	r.Head("/health", h.Health)
 	r.Get("/ready", h.Ready)
 
 	r.Get("/evaluate", h.EvaluateAllFlags)
