@@ -6,7 +6,7 @@ A production-grade, full-stack feature flag management system — built from scr
 |-----------|-----|
 | Dashboard | [feature-flag-platform.vercel.app](https://feature-flag-platform.vercel.app/dashboard) |
 | Admin API | [feature-flag-0bfu.onrender.com](https://feature-flag-0bfu.onrender.com) |
-| Evaluation API | [strong-lorena-07manan-b3c1d402.koyeb.app](https://strong-lorena-07manan-b3c1d402.koyeb.app/) |
+| Evaluation API | [feature-flag-evaluation-api.onrender.com](https://feature-flag-evaluation-api.onrender.com) |
 
 
 ---
