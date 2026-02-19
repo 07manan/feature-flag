@@ -56,7 +56,7 @@ type MemoryCacheConfig struct {
 func Load() (*Config, error) {
 	cfg := &Config{
 		Server: ServerConfig{
-			Port:            getEnvInt("SERVER_PORT", 8081),
+			Port:            getEnvInt("PORT", 8081),
 			ReadTimeout:     getEnvDuration("SERVER_READ_TIMEOUT", 5*time.Second),
 			WriteTimeout:    getEnvDuration("SERVER_WRITE_TIMEOUT", 10*time.Second),
 			ShutdownTimeout: getEnvDuration("SERVER_SHUTDOWN_TIMEOUT", 30*time.Second),
