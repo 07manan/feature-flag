@@ -24,7 +24,7 @@ function maskApiKey(apiKey: string): string {
 export function ApiKeyDisplay({ apiKey }: ApiKeyDisplayProps) {
     return (
         <div className="inline-flex items-center gap-1">
-            <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
+            <code className="bg-muted/30 border border-border/50 px-1.5 py-0.5 rounded text-sm font-mono">
                 {maskApiKey(apiKey)}
             </code>
             <CopyButton value={apiKey} />

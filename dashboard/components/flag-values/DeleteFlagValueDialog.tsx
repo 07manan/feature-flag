@@ -77,11 +77,11 @@ export function DeleteFlagValueDialog({
                     <AlertDialogTitle>Delete Flag Value</AlertDialogTitle>
                     <AlertDialogDescription>
                         Are you sure you want to delete the flag value for{" "}
-                        <code className="text-sm bg-muted px-1 rounded">
+                        <code className="text-sm bg-muted/30 border border-border/50 px-1 rounded">
                             {flagValue.flagKey}
                         </code>{" "}
                         in environment{" "}
-                        <code className="text-sm bg-muted px-1 rounded">
+                        <code className="text-sm bg-muted/30 border border-border/50 px-1 rounded">
                             {flagValue.environmentKey}
                         </code>
                         ? This action cannot be undone.
@@ -92,7 +92,7 @@ export function DeleteFlagValueDialog({
                     <AlertDialogAction
                         onClick={handleDelete}
                         disabled={isDeleting}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        className="bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive/20"
                     >
                         {isDeleting ? "Deleting..." : "Delete"}
                     </AlertDialogAction>

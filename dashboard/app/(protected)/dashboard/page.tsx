@@ -33,9 +33,15 @@ interface DashboardStats {
 }
 
 const TYPE_BADGE_COLORS: Record<string, string> = {
-    STRING: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-    BOOLEAN: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-    NUMBER: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
+    STRING: "",
+    BOOLEAN: "",
+    NUMBER: "",
+};
+
+const TYPE_BADGE_VARIANT: Record<string, "info" | "success" | "purple"> = {
+    STRING: "info",
+    BOOLEAN: "success",
+    NUMBER: "purple",
 };
 
 export default function DashboardPage() {
@@ -87,7 +93,7 @@ export default function DashboardPage() {
                     </p>
                 </div>
                 <div className="flex items-center justify-center py-16">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
                 </div>
             </div>
         );
@@ -96,7 +102,7 @@ export default function DashboardPage() {
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
                 <p className="text-muted-foreground mt-1">
                     Welcome back, {user?.firstName}!
                 </p>
@@ -107,11 +113,11 @@ export default function DashboardPage() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Flags</CardTitle>
-                        <Flag className="h-4 w-4 text-muted-foreground" />
+                        <Flag className="h-4 w-4 text-primary/60" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{stats?.flags.length ?? 0}</div>
-                        <p className="text-xs text-muted-foreground">
+                        <div className="text-3xl font-semibold tabular-nums">{stats?.flags.length ?? 0}</div>
+                        <p className="text-xs text-muted-foreground/60 mt-1">
                             Across {stats?.environments.length ?? 0} environments
                         </p>
                     </CardContent>
@@ -120,11 +126,11 @@ export default function DashboardPage() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Environments</CardTitle>
-                        <Globe className="h-4 w-4 text-muted-foreground" />
+                        <Globe className="h-4 w-4 text-primary/60" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{stats?.environments.length ?? 0}</div>
-                        <p className="text-xs text-muted-foreground">
+                        <div className="text-3xl font-semibold tabular-nums">{stats?.environments.length ?? 0}</div>
+                        <p className="text-xs text-muted-foreground/60 mt-1">
                             {activeEnvironments.length} active
                         </p>
                     </CardContent>
@@ -133,11 +139,11 @@ export default function DashboardPage() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Team Members</CardTitle>
-                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <Users className="h-4 w-4 text-primary/60" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{stats?.users.length ?? 0}</div>
-                        <p className="text-xs text-muted-foreground">
+                        <div className="text-3xl font-semibold tabular-nums">{stats?.users.length ?? 0}</div>
+                        <p className="text-xs text-muted-foreground/60 mt-1">
                             {adminUsers.length} admin · {(stats?.users.length ?? 0) - adminUsers.length} guest
                         </p>
                     </CardContent>
@@ -186,12 +192,12 @@ export default function DashboardPage() {
                                                     </Link>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
+                                                    <code className="bg-muted/30 px-1.5 py-0.5 rounded border border-border/50 text-sm font-mono">
                                                         {flag.key}
                                                     </code>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Badge variant="secondary" className={TYPE_BADGE_COLORS[flag.type]}>
+                                                    <Badge variant={TYPE_BADGE_VARIANT[flag.type] ?? "secondary"}>
                                                         {flag.type}
                                                     </Badge>
                                                 </TableCell>

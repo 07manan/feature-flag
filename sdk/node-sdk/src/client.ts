@@ -4,7 +4,7 @@ import { AuthenticationError, FeatureFlagError, FlagNotFoundError } from "./erro
 import { LocalCache } from "./cache.js";
 import { HttpClient } from "./http-client.js";
 
-const DEFAULT_BASE_URL = "https://strong-lorena-07manan-b3c1d402.koyeb.app";
+const DEFAULT_BASE_URL = "https://feature-flag-evaluation-api.onrender.com/";
 const DEFAULT_CACHE_TTL_MS = 30_000;
 const DEFAULT_REQUEST_TIMEOUT_MS = 10_000;
 

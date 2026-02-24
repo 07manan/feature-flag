@@ -85,7 +85,7 @@ client.close();
 | Option           | Type     | Default                                                      | Description                          |
 | ---------------- | -------- | ------------------------------------------------------------ | ------------------------------------ |
 | `apiKey`         | `string` | **(required)**                                               | API key (must start with `ff_`)      |
-| `baseUrl`        | `string` | `https://strong-lorena-07manan-b3c1d402.koyeb.app`          | Evaluation API base URL              |
+| `baseUrl`        | `string` | `https://feature-flag-evaluation-api.onrender.com/`          | Evaluation API base URL              |
 | `cacheTTL`       | `number` | `30000` (30s)                                                | Cache time-to-live in milliseconds   |
 | `requestTimeout` | `number` | `10000` (10s)                                                | HTTP request timeout in milliseconds |
 

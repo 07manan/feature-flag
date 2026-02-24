@@ -24,10 +24,10 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const TYPE_BADGE_COLORS: Record<FlagType, string> = {
-    STRING: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-    BOOLEAN: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-    NUMBER: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
+const TYPE_BADGE_VARIANT: Record<FlagType, "info" | "success" | "purple"> = {
+    STRING: "info",
+    BOOLEAN: "success",
+    NUMBER: "purple",
 };
 
 export default function FlagsPage() {
@@ -67,7 +67,7 @@ export default function FlagsPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Feature Flags</h1>
+                <h1 className="text-xl font-semibold">Feature Flags</h1>
                 <Link href="/flags/new">
                     <Button>
                         <Plus className="mr-2 h-4 w-4" />
@@ -95,7 +95,7 @@ export default function FlagsPage() {
 
                     {isLoading ? (
                         <div className="flex items-center justify-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                            <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
                         </div>
                     ) : flags.length === 0 ? (
                         <div className="text-center py-8">
@@ -122,14 +122,13 @@ export default function FlagsPage() {
                                         <TableRow key={flag.id}>
                                             <TableCell className="pl-4">{flag.name}</TableCell>
                                             <TableCell>
-                                                <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
+                                                <code className="bg-muted/30 px-1.5 py-0.5 rounded border border-border/50 text-sm font-mono">
                                                     {flag.key}
                                                 </code>
                                             </TableCell>
                                             <TableCell>
                                                 <Badge
-                                                    variant="secondary"
-                                                    className={TYPE_BADGE_COLORS[flag.type]}
+                                                    variant={TYPE_BADGE_VARIANT[flag.type]}
                                                 >
                                                     {flag.type}
                                                 </Badge>

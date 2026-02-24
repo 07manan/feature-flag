@@ -410,7 +410,7 @@ export function FlagValueForm({ mode, initialData }: FlagValueFormProps) {
                         <div
                             className={`text-sm font-medium ${
                                 percentageSum === 100
-                                    ? "text-green-600 dark:text-green-400"
+                                    ? "text-primary"
                                     : "text-destructive"
                             }`}
                         >

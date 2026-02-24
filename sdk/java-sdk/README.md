@@ -85,7 +85,7 @@ FeatureFlagClient client = FeatureFlagClient.builder()
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `apiKey` | String | **Required** | API key from your environment |
-| `baseUrl` | String | `https://strong-lorena-07manan-b3c1d402.koyeb.app` | Evaluation API endpoint |
+| `baseUrl` | String | `https://feature-flag-evaluation-api.onrender.com/` | Evaluation API endpoint |
 | `cacheTTL` | long, TimeUnit | 30 seconds | Time-to-live for cached flag values |
 | `httpTimeout` | long, long, TimeUnit | 5s, 10s | Connection and socket timeouts |
 

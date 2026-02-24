@@ -69,7 +69,7 @@ export function DeleteEnvironmentDialog({ environment, onDeleted, trigger }: Del
                     <AlertDialogTitle>Delete Environment</AlertDialogTitle>
                     <AlertDialogDescription>
                         Are you sure you want to delete the environment &quot;{environment.name}&quot; (
-                        <code className="text-sm bg-muted px-1 rounded">{environment.key}</code>)?
+                        <code className="text-sm bg-muted/30 border border-border/50 px-1 rounded">{environment.key}</code>)?
                         This action cannot be undone.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
@@ -78,7 +78,7 @@ export function DeleteEnvironmentDialog({ environment, onDeleted, trigger }: Del
                     <AlertDialogAction
                         onClick={handleDelete}
                         disabled={isDeleting}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        className="bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive/20"
                     >
                         {isDeleting ? "Deleting..." : "Delete"}
                     </AlertDialogAction>

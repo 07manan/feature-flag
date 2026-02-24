@@ -60,7 +60,7 @@ export default function EnvironmentsPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Environments</h1>
+                <h1 className="text-xl font-semibold">Environments</h1>
                 <Link href="/environments/new">
                     <Button>
                         <Plus className="mr-2 h-4 w-4" />
@@ -88,7 +88,7 @@ export default function EnvironmentsPage() {
 
                     {isLoading ? (
                         <div className="flex items-center justify-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                            <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
                         </div>
                     ) : environments.length === 0 ? (
                         <div className="text-center py-8">
@@ -114,7 +114,7 @@ export default function EnvironmentsPage() {
                                         <TableRow key={environment.id}>
                                             <TableCell className="pl-4">{environment.name}</TableCell>
                                             <TableCell>
-                                                <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
+                                                <code className="bg-muted/30 px-1.5 py-0.5 rounded border border-border/50 text-sm font-mono">
                                                     {environment.key}
                                                 </code>
                                             </TableCell>

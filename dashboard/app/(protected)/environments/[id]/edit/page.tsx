@@ -58,7 +58,7 @@ export default function EditEnvironmentPage() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center py-16">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
             </div>
         );
     }
@@ -66,7 +66,7 @@ export default function EditEnvironmentPage() {
     if (error || !environment) {
         return (
             <div className="space-y-6">
-                <h1 className="text-2xl font-bold">Edit Environment</h1>
+                <h1 className="text-xl font-semibold">Edit Environment</h1>
                 <Card>
                     <CardContent className="py-8">
                         <div className="text-center">
@@ -85,7 +85,7 @@ export default function EditEnvironmentPage() {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-bold">Edit Environment</h1>
+            <h1 className="text-xl font-semibold">Edit Environment</h1>
             <Card>
                 <CardHeader>
                     <CardTitle>

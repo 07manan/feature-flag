@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
  * </pre>
  */
 public class FeatureFlagClientBuilder {
-    private static final String DEFAULT_BASE_URL = "https://strong-lorena-07manan-b3c1d402.koyeb.app";
+    private static final String DEFAULT_BASE_URL = "https://feature-flag-evaluation-api.onrender.com/";
     private static final long DEFAULT_CACHE_TTL = 30;
     private static final TimeUnit DEFAULT_CACHE_TTL_UNIT = TimeUnit.SECONDS;
     private static final long DEFAULT_CONNECTION_TIMEOUT = 5;

@@ -32,7 +32,10 @@ export default function AuthLayout({
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4">
-            {children}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,oklch(0.72_0.15_195_/_0.04),transparent_70%)]" />
+            <div className="relative">
+                {children}
+            </div>
         </div>
     );
 }

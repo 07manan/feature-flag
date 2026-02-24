@@ -25,9 +25,9 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const ROLE_BADGE_COLORS: Record<string, string> = {
-    ADMIN: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-    GUEST: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300",
+const ROLE_BADGE_VARIANT: Record<string, "default" | "secondary"> = {
+    ADMIN: "default",
+    GUEST: "secondary",
 };
 
 export default function UsersPage() {
@@ -68,7 +68,7 @@ export default function UsersPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold">User Management</h1>
+                <h1 className="text-xl font-semibold">User Management</h1>
             </div>
 
             <Card>
@@ -90,7 +90,7 @@ export default function UsersPage() {
 
                     {isLoading ? (
                         <div className="flex items-center justify-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                            <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
                         </div>
                     ) : users.length === 0 ? (
                         <div className="text-center py-8">
@@ -121,19 +121,17 @@ export default function UsersPage() {
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>
                                                 <Badge
-                                                    variant="secondary"
-                                                    className={ROLE_BADGE_COLORS[user.role]}
+                                                    variant={ROLE_BADGE_VARIANT[user.role] ?? "secondary"}
                                                 >
                                                     {user.role}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
                                                 <Badge
-                                                    variant="secondary"
-                                                    className={
+                                                    variant={
                                                         user.enabled
-                                                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                                                            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                                            ? "success"
+                                                            : "destructive"
                                                     }
                                                 >
                                                     {user.enabled ? "Enabled" : "Disabled"}

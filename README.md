@@ -416,7 +416,7 @@ Admin API: `http://localhost:8080` · Evaluation API: `http://localhost:8081` ·
 | **Java SDK** | Java 21, Apache HttpClient, Jackson, SLF4J |
 | **Node SDK** | TypeScript, native fetch |
 | **Databases** | PostgreSQL 16, Redis 7 |
-| **Infra / Hosting** | Vercel, Render, Koyeb, Docker Compose |
+| **Infra / Hosting** | Vercel, Render, Docker Compose |
 | **Benchmarking** | Go, HdrHistogram, token-bucket rate limiter |
 
 ---

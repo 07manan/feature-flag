@@ -78,7 +78,7 @@ export function DeleteUserDialog({ user, onDeleted, trigger }: DeleteUserDialogP
                     <AlertDialogAction
                         onClick={handleDelete}
                         disabled={isDeleting}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        className="bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive/20"
                     >
                         {isDeleting ? "Deleting..." : "Delete"}
                     </AlertDialogAction>

@@ -63,24 +63,24 @@ export default function ProtectedLayout({
     }
 
     return (
-        <div className="min-h-screen flex flex-col">
-            <header className="border-b bg-card">
+        <div className="h-screen flex flex-col">
+            <header className="shrink-0 border-b border-border/50 bg-background">
                 <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-                    <h1 className="text-lg font-semibold">Feature Flags</h1>
+                    <h1 className="text-lg font-semibold text-foreground">Feature Flags</h1>
                     <div className="flex items-center gap-4">
                         <span className="text-sm text-muted-foreground">
                             {user?.firstName} {user?.lastName}
                         </span>
-                        <Button variant="outline" size="sm" onClick={logout}>
+                        <Button variant="ghost" size="sm" onClick={logout}>
                             Sign out
                         </Button>
                     </div>
                 </div>
             </header>
 
-            <div className="flex flex-1">
+            <div className="flex flex-1 overflow-hidden">
                 <Sidebar />
-                <main className="flex-1 p-6">
+                <main className="flex-1 overflow-y-auto p-8">
                     {children}
                 </main>
             </div>

@@ -27,10 +27,10 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const TYPE_BADGE_COLORS: Record<FlagType, string> = {
-    STRING: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-    BOOLEAN: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-    NUMBER: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
+const TYPE_BADGE_VARIANT: Record<FlagType, "info" | "success" | "purple"> = {
+    STRING: "info",
+    BOOLEAN: "success",
+    NUMBER: "purple",
 };
 
 export default function FlagValuesPage() {
@@ -139,9 +139,9 @@ export default function FlagValuesPage() {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Flag Values</h1>
+        <div className="flex flex-col h-full gap-6">
+            <div className="shrink-0 flex items-center justify-between">
+                <h1 className="text-xl font-semibold">Flag Values</h1>
                 <Link href="/flag-values/new">
                     <Button>
                         <Plus className="mr-2 h-4 w-4" />
@@ -150,11 +150,11 @@ export default function FlagValuesPage() {
                 </Link>
             </div>
 
-            <Card>
+            <Card className="flex-1 min-h-0 flex flex-col">
                 <CardHeader>
                     <CardTitle>Flag Values</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1 min-h-0 flex flex-col">
                     <div className="mb-4 grid gap-4 md:grid-cols-2">
                         <div>
                             <label className="text-sm font-medium mb-2 block">
@@ -188,7 +188,7 @@ export default function FlagValuesPage() {
 
                     {isLoading ? (
                         <div className="flex items-center justify-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                            <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
                         </div>
                     ) : flagValues.length === 0 ? (
                         <div className="text-center py-8">
@@ -199,7 +199,7 @@ export default function FlagValuesPage() {
                             </p>
                         </div>
                     ) : (
-                        <div className="rounded-md border">
+                        <div className="rounded-md border flex-1 min-h-0 overflow-auto">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -216,20 +216,19 @@ export default function FlagValuesPage() {
                                     {flagValues.map((flagValue) => (
                                         <TableRow key={flagValue.id}>
                                             <TableCell className="pl-4">
-                                                <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
+                                                <code className="bg-muted/30 px-1.5 py-0.5 rounded border border-border/50 text-sm font-mono">
                                                     {flagValue.flagKey}
                                                 </code>
                                             </TableCell>
                                             <TableCell>
-                                                <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
+                                                <code className="bg-muted/30 px-1.5 py-0.5 rounded border border-border/50 text-sm font-mono">
                                                     {flagValue.environmentKey}
                                                 </code>
                                             </TableCell>
                                             <TableCell>
                                                 <Badge
-                                                    variant="secondary"
-                                                    className={
-                                                        TYPE_BADGE_COLORS[flagValue.flagType]
+                                                    variant={
+                                                        TYPE_BADGE_VARIANT[flagValue.flagType]
                                                     }
                                                 >
                                                     {flagValue.flagType}
