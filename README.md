@@ -1,13 +1,6 @@
 # Feature Flag Platform
 
-A production-grade, full-stack feature flag management system — built from scratch with a polyglot architecture spanning Java, Go, TypeScript, and React. Designed for real-world scale: deterministic percentage rollouts, sub-millisecond evaluations, two-tier caching, and multi-environment support.
-
-| Component | URL |
-|-----------|-----|
-| Dashboard | [feature-flag-platform.vercel.app](https://feature-flag-platform.vercel.app/dashboard) |
-| Admin API | [feature-flag-0bfu.onrender.com](https://feature-flag-0bfu.onrender.com) |
-| Evaluation API | [feature-flag-evaluation-api.onrender.com](https://feature-flag-evaluation-api.onrender.com) |
-
+A full-stack feature-flag platform with a polyglot control-plane / data-plane architecture spanning Java, Go, TypeScript, and React — deterministic percentage rollouts, two-tier caching, Redis Pub/Sub cache invalidation, and multi-environment support.
 
 ---
 
@@ -50,9 +43,9 @@ A production-grade, full-stack feature flag management system — built from scr
 
 ## Performance
 
-Stress-tested with a [custom Go benchmarking tool](benchmarking/README.md) across 4 scenarios — constant load, ramp-up, spike traffic, and 30-minute soak — hitting **2.57 million total requests** with **99.999% availability** across all runs.
+Stress-tested with a [custom Go benchmarking tool](benchmarking/README.md) across four scenarios — constant load, ramp-up, spike, and a 30-minute soak — for **2.57 million total requests** with **12 timeouts total** across all runs.
 
-> **Note:** All benchmarks were run on a single machine — the stress tester and Evaluation API running on bare metal, with PostgreSQL and Redis in Docker containers.
+> **Note:** All benchmarks ran on a single machine — the stress tester and Evaluation API on bare metal, with PostgreSQL and Redis in Docker, over loopback (no network hop, no TLS). Treat these as micro-benchmarks, not a production SLO.
 
 ### Constant Load — 1,000 RPS for 10 minutes
 
@@ -62,7 +55,7 @@ Sustained high-throughput evaluation under steady-state conditions.
 |--------|-------|
 | **Throughput** | **998 RPS** sustained (target: 1,000) |
 | **Total Requests** | 598,707 |
-| **Availability** | **99.999%** (3 timeouts) |
+| **Errors** | 3 timeouts |
 | **p50 Latency** | **0.33 ms** |
 | **p95 Latency** | **2.24 ms** |
 | **p99 Latency** | **3.17 ms** |
@@ -92,7 +85,7 @@ Linearly increasing load to find the breaking point. Peak observed: **4,919 RPS*
 | **Peak RPS** | **4,919** |
 | **Average RPS** | 2,500 |
 | **Total Requests** | 749,985 |
-| **Availability** | **99.999%** (6 timeouts) |
+| **Errors** | 6 timeouts |
 | **p50 Latency** | **0.36 ms** |
 | **p95 Latency** | **1.64 ms** |
 | **p99 Latency** | **3.04 ms** |
@@ -122,7 +115,7 @@ Simulates sudden traffic bursts (10× spike) to test system resilience.
 | **Baseline RPS** | 500 |
 | **Peak RPS** | **5,001** |
 | **Total Requests** | 322,495 |
-| **Availability** | **99.999%** (2 timeouts) |
+| **Errors** | 2 timeouts |
 | **p50 Latency** | **0.42 ms** |
 | **p95 Latency** | **2.71 ms** |
 | **p99 Latency** | **3.73 ms** |
@@ -151,7 +144,7 @@ Extended endurance test to detect memory leaks, connection exhaustion, and laten
 |--------|-------|
 | **Throughput** | **499 RPS** sustained for 30 minutes |
 | **Total Requests** | 897,450 |
-| **Availability** | **99.999%** (1 timeout) |
+| **Errors** | 1 timeout |
 | **p50 Latency** | **0.44 ms** |
 | **p95 Latency** | **2.90 ms** |
 | **p99 Latency** | **3.90 ms** |
@@ -174,13 +167,13 @@ Extended endurance test to detect memory leaks, connection exhaustion, and laten
 
 ### Summary
 
-| Scenario | Duration | Total Requests | Availability | p50 (ms) | p99 (ms) | Peak RPS |
-|----------|----------|----------------|--------------|----------|----------|----------|
-| Constant | 10 min | 598,707 | 99.999% | 0.33 | 3.17 | 1,002 |
-| Ramp-Up | 5 min | 749,985 | 99.999% | 0.36 | 3.04 | 4,919 |
-| Spike | 10 min | 322,495 | 99.999% | 0.42 | 3.73 | 5,001 |
-| Soak | 30 min | 897,450 | 99.999% | 0.44 | 3.90 | 501 |
-| **Total** | **55 min** | **2,568,637** | **99.999%** | — | — | **5,001** |
+| Scenario | Duration | Total Requests | Errors | p50 (ms) | p99 (ms) | Peak RPS |
+|----------|----------|----------------|--------|----------|----------|----------|
+| Constant | 10 min | 598,707 | 3 | 0.33 | 3.17 | 1,002 |
+| Ramp-Up | 5 min | 749,985 | 6 | 0.36 | 3.04 | 4,919 |
+| Spike | 10 min | 322,495 | 2 | 0.42 | 3.73 | 5,001 |
+| Soak | 30 min | 897,450 | 1 | 0.44 | 3.90 | 501 |
+| **Total** | **55 min** | **2,568,637** | **12** | — | — | **5,001** |
 
 ![All four benchmark modes — RPS over time](benchmarking/results/graphs/all_modes_overview.svg)
 
@@ -231,10 +224,10 @@ Request → L1 Memory Cache (Ristretto, 30s TTL)
 ```
 
 **Key design decisions:**
-- Written in Go for raw throughput — serves ~1,000 RPS with p50 of 0.33ms
-- L1 cache yields sub-millisecond responses for 95-98% of requests
-- Subscribes to Redis Pub/Sub for real-time cache invalidation from Admin API
-- Stateless — horizontally scalable behind a load balancer
+- Written in Go for raw throughput — sustained ~1,000 RPS at p50 0.33 ms in the benchmark
+- L1 in-process cache serves repeat reads from memory, keeping typical latency well under a millisecond
+- Subscribes to Redis Pub/Sub for cache invalidation from the Admin API — best-effort and eventual, no polling
+- Stateless — designed to scale horizontally behind a load balancer (benchmarked single-instance)
 
 **Tech:** Go · Chi router · Ristretto (in-memory cache) · Redis · PostgreSQL
 
@@ -439,6 +432,10 @@ feature-flag/
 
 ---
 
-## License
+## Current Limitations
 
-MIT
+- **Node/TypeScript SDK** is built but not yet published to npm — install from source for now.
+- **Targeting** is percentage-of-variants only; there are no attribute- or segment-based rules.
+- **Cache invalidation** over Redis Pub/Sub is best-effort and fire-and-forget — L1 can serve stale values up to its 30s TTL before converging.
+- **OAuth** ships with Google only (GitHub/Microsoft are stubbed behind the provider interface).
+- **Benchmarks** are single-node, single-run, over loopback — a performance sketch, not a production SLO.

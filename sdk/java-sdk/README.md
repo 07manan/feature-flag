@@ -22,9 +22,9 @@ Add the following dependency to your `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>io.github._07manan.featureflags</groupId>
+    <groupId>io.github.07manan</groupId>
     <artifactId>featureflags-java-sdk</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
